@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_zoom"
+        android:icon="@android:drawable/ic_menu_zoom"
+        android:title="@string/zoom"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_ruta"
+        android:icon="@android:drawable/ic_menu_directions"
+        android:title="@string/ruta"
+        app:showAsAction="always"/>
+
+</menu>
