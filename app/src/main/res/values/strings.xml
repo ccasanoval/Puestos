@@ -2,4 +2,5 @@
     <string name="app_name">Puestos Test 1</string>
     <string name="zoom">Zoom</string>
     <string name="ruta">Ruta</string>
+    <string name="img_still_loading">La imagen aun se está cargando...</string>
 </resources>
