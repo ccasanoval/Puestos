@@ -1,6 +1,7 @@
 package com.cesoft.puestos.ui.login
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.v7.app.AppCompatActivity
@@ -12,11 +13,11 @@ import android.widget.TextView
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.cesoft.puestos.App
+import com.cesoft.puestos.data.auth.Auth
+import com.cesoft.puestos.ui.mapa.MapaActivity
 
-
+//TODO: MVVM
 /**
  * Created by ccasanova on 30/11/2017
  */
@@ -27,7 +28,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 	private var txtEmail: EditText? = null
 	private var txtClave: EditText? = null
 
-	private lateinit var fireAuth: FirebaseAuth
+	private lateinit var auth: Auth
 
 
 	//______________________________________________________________________________________________
@@ -44,13 +45,13 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 		val btnLogout: Button = findViewById(R.id.btnLogout)
 		btnLogout.setOnClickListener(this)
 
-		fireAuth = (application as App).fireAuth
+		auth = (application as App).auth
 	}
 
 	//______________________________________________________________________________________________
 	override fun onStart() {
 		super.onStart()
-		updateUI(fireAuth.currentUser)
+		updateUI(auth.getEmail())
 	}
 
 	//______________________________________________________________________________________________
@@ -62,34 +63,32 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
 		showProgressDialog()
 
-		// [START sign_in_with_email]
-		fireAuth.signInWithEmailAndPassword(email, password)
-			.addOnCompleteListener(this, { task ->
-				if(task.isSuccessful) {
-					Log.e(TAG, "signInWithEmail:success----------------------")
-					val user = fireAuth.currentUser
-					updateUI(user)
-				}
-				else {
-					Log.e(TAG, "signInWithEmail:failure-------------------------", task.exception)
+		auth.login(email, password, { auth: Auth, exception: Exception? ->
+			if(auth.isLogedIn() && exception == null) {
+				Log.e(TAG, "signInWithEmail:success----------------------")
+					updateUI(auth.getEmail())
+					val intent = Intent(this, MapaActivity::class.java)
+					startActivity(intent)
+					finish()
+			}
+			else {
+				Log.e(TAG, "signInWithEmail:failure-------------------------", exception)
 					Toast.makeText(this@LoginActivity, R.string.error_login, Toast.LENGTH_SHORT).show()
 					updateUI(null)
 					txtStatus!!.setText(R.string.error_login)
-				}
-				hideProgressDialog()
-			})
+			}
+		})
 	}
 
 	//______________________________________________________________________________________________
 	private fun signOut() {
-		fireAuth.signOut()
+		auth.logout()
 		updateUI(null)
 	}
 
 	//______________________________________________________________________________________________
 	private fun validateForm(): Boolean {
 		var valid = true
-Log.e(TAG, "validateForm----------------------------------------------")
 		val email = txtEmail!!.text.toString()
 		if(TextUtils.isEmpty(email)) {
 			txtEmail!!.error = getString(R.string.campo_obligatorio)
@@ -112,10 +111,10 @@ Log.e(TAG, "validateForm----------------------------------------------")
 	}
 
 	//______________________________________________________________________________________________
-	private fun updateUI(user: FirebaseUser?) {
+	private fun updateUI(userEmail: String?, isVerifiedEmail: Boolean? = false) {
 		hideProgressDialog()
-		if(user != null) {
-			txtStatus!!.text = getString(R.string.ok_login, user.email, user.isEmailVerified)
+		if(userEmail != null) {
+			txtStatus!!.text = getString(R.string.ok_login, userEmail, isVerifiedEmail)
 
 			var view: View = findViewById(R.id.layLoginBotones)
 			view.visibility=(View.GONE)
@@ -142,13 +141,11 @@ Log.e(TAG, "validateForm----------------------------------------------")
 	override fun onClick(v: View) {
 		val i = v.id
 		if(i == R.id.btnLogin) {
-			Log.e(TAG, "onClick-------------------"+txtEmail!!.text.toString()+" : "+txtClave!!.text.toString())
 			signIn(txtEmail!!.text.toString(), txtClave!!.text.toString())
 		}
 		else if(i == R.id.btnLogout) {
 			signOut()
 		}
-
 	}
 
 

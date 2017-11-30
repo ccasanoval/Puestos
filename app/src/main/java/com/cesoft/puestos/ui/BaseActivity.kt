@@ -1,19 +1,19 @@
 package com.cesoft.puestos.ui
 
-import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import com.cesoft.puestos.App
 import com.cesoft.puestos.Log
+import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.ui.login.LoginActivity
 
 /**
  * Created by ccasanova on 30/11/2017
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-open
+//open
 abstract class BaseActivity: AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -23,18 +23,18 @@ abstract class BaseActivity: AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		val fireAuth: FirebaseAuth = (application as App).fireAuth
-		fireAuth.addAuthStateListener { auth ->
-			if(auth.currentUser == null)
+		val auth: Auth = (application as App).auth
+		auth.addAuthStateListener {
+			if(auth.isNotLogedIn())
 				toLoginActivity()
 			else
-				Log.e("BaseActivity", "onCreate:-2---------------------USR:"+fireAuth.currentUser!!.email)
+				Log.e("BaseActivity", "onCreate:-2---------------------USR:"+auth.getEmail())
 		}
-		if(fireAuth.currentUser == null) {// || fireAuth.currentUser!!.email == null) {
+		if(auth.isNotLogedIn()) {
 			toLoginActivity()
 		}
 		else {
-			Log.e("BaseActivity", "onCreate:----------------------USR:"+fireAuth.currentUser!!.email)
+			Log.e("BaseActivity", "onCreate:----------------------USR:"+auth.getEmail())
 		}
 	}
 

@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:theme="@style/ThemeOverlay.MyTitleText"
-            android:text="@string/email_y_clave"
+            android:text="@string/app_name"
              />
 
         <TextView

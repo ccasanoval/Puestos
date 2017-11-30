@@ -3,11 +3,9 @@ package com.cesoft.puestos.ui.mapa
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.PointF
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.GestureDetector
 import android.view.Menu
 import android.view.MotionEvent
@@ -17,24 +15,6 @@ import com.cesoft.puestos.R
 import com.cesoft.puestos.ui.BaseActivity
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-
-
-//ZOOM ImageView:
-//https://blog.fossasia.org/implementing-a-zoomable-imageview-by-extending-the-default-viewpager-in-phimpme-android/
-
-//Arch Comp
-//https://developer.android.com/topic/libraries/architecture/adding-components.html
-
-// PATH FINDING
-//https://stackoverflow.com/questions/25120786/a-star-algorithm-with-image-map-android
-//https://github.com/citiususc/hipster
-
-//INDOOR LOCATION
-//https://play.google.com/store/apps/details?id=com.microsoft.msra.followus.app
-//https://arxiv.org/ftp/arxiv/papers/1405/1405.5669.pdf & what u did
-
-//TODO: Login: Admin: Permite añadir puestos de trabajo, modificarlos...
-//				User: Permite bucar y ver puestos de trabajo...
 
 
 /**
@@ -65,11 +45,20 @@ class MapaActivity : BaseActivity() {
 
 		/// ViewModel
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
-		viewModel.usuario.observe(this, Observer<String>
-		{
-			usuario ->
-				title = usuario
+		viewModel.usuario.observe(this, Observer<String> {
+			usuario -> setTituloFromEmail(usuario)
 		})
+	}
+
+	//______________________________________________________________________________________________
+	private fun setTituloFromEmail(titulo: String?) {
+		if(titulo!=null) {
+			val i = titulo.indexOf('@')
+			if(i > 0)
+				title = titulo.substring(0, i)
+			else
+				title = titulo
+		}
 	}
 
 	//______________________________________________________________________________________________

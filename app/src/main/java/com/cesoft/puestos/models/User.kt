@@ -10,5 +10,5 @@ data class User(
 	var type: Type = Type.User
 )
 {
-	enum class Type { Admin, User }
+	enum class Type(name: String) { Admin("Admin"), User("User") }
 }
