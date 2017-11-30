@@ -1,4 +1,4 @@
-package com.cesoft.puestos1
+package com.cesoft.puestos
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

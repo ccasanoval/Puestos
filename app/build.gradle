@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.cesoft.puestos1"
+        applicationId "com.cesoft.puestos"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
@@ -34,4 +34,11 @@ dependencies {
 
     // Architecture Components
     implementation "android.arch.lifecycle:extensions:1.0.0"
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-firestore:11.6.2'
+    implementation 'com.google.firebase:firebase-auth:11.6.2'
 }
+
+// Firebase
+apply plugin: 'com.google.gms.google-services'

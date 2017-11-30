@@ -2,5 +2,16 @@
     <string name="app_name">Puestos Test 1</string>
     <string name="zoom">Zoom</string>
     <string name="ruta">Ruta</string>
-    <string name="img_still_loading">La imagen aun se está cargando...</string>
+    <string name="cargando_imagen">La imagen aun se está cargando…</string>
+    <string name="email_y_clave">Email y Clave</string>
+    <string name="sesion_cerrada">Sesión cerrada</string>
+    <string name="email">Email</string>
+    <string name="clave">Clave</string>
+    <string name="login">Entrar</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="cargando">Cargando…</string>
+    <string name="error_login">Las credenciales son incorrectas</string>
+    <string name="campo_obligatorio">Campo obligatorio</string>
+    <string name="ok_login">Usuario: %1$s (verificado: %2$b)</string>
+
 </resources>

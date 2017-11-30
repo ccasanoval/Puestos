@@ -1,6 +1,4 @@
-package com.cesoft.puestos1
-
-import com.cesoft.puestos1.BuildConfig
+package com.cesoft.puestos
 
 /**
  * Created by ccasanova on 08/11/2017

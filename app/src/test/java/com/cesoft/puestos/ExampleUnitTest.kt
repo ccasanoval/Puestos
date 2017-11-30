@@ -1,4 +1,4 @@
-package com.cesoft.puestos1
+package com.cesoft.puestos
 
 import org.junit.Test
 
