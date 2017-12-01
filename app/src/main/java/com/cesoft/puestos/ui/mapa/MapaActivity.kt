@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.ui.BaseActivity
+import com.cesoft.puestos.ui.dlg.Dlg
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
@@ -70,10 +71,11 @@ class MapaActivity : BaseActivity() {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when(item.itemId) {
 			R.id.action_logout -> {
-				viewModel.logout()
+				Dlg.showSiNo(this,
+						getString(R.string.seguro_logout),
+						{ si -> if(si) viewModel.logout() })
 				return true
 			}
-
 			else ->
 				return super.onOptionsItemSelected(item)
 		}

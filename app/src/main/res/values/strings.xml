@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">Administrador de Puestos</string>
-    <string name="zoom">Zoom</string>
-    <string name="ruta">Ruta</string>
+    <string name="app_name">Puestos</string>
+    <string name="app_title">Administrador de Puestos</string>
     <string name="cargando_imagen">La imagen aun se está cargando…</string>
     <string name="sesion_cerrada">Inicia tu sesión</string>
     <string name="email">Email</string>
@@ -12,5 +11,6 @@
     <string name="error_login">Las credenciales son incorrectas</string>
     <string name="campo_obligatorio">Campo obligatorio</string>
     <string name="ok_login">Usuario: %1$s (verificado: %2$b)</string>
+    <string name="seguro_logout">¿Seguro que desea cerrar sesión?</string>
 
 </resources>
