@@ -4,11 +4,8 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
-import android.view.MenuItem
 import android.os.Bundle
-import android.view.GestureDetector
-import android.view.Menu
-import android.view.MotionEvent
+import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
@@ -27,7 +24,6 @@ class MapaActivity : BaseActivity() {
 	private lateinit var viewModel : MapaViewModel
 	private lateinit var imgPlano: SubsamplingScaleImageView
 
-
 	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)//BaseActivity@onCreate(savedInstanceState)
@@ -42,7 +38,14 @@ class MapaActivity : BaseActivity() {
 		//imgPlano.setImage(ImageSource.asset("map.png"))
 		//imgPlano.setImage(ImageSource.uri("/sdcard/DCIM/DSCM00123.JPG"));
 
-		imgPlano.setOnTouchListener { _, motionEvent -> getGestureDetector().onTouchEvent(motionEvent) }
+		//imgPlano.setDoubleTapZoomDuration(200)
+		//imgPlano.setDoubleTapZoomScale()
+		//imgPlano.setOnTouchListener { _, motionEvent -> getGestureDetector().onTouchEvent(motionEvent) }
+
+		val gesture = getGestureDetector()//Si no uso esta variable, deja de funcionar bien ¿?¿?
+		imgPlano.setOnTouchListener { _, motionEvent -> gesture.onTouchEvent(motionEvent) }
+
+		registerForContextMenu(imgPlano)
 
 		/// ViewModel
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
@@ -62,6 +65,7 @@ class MapaActivity : BaseActivity() {
 		}
 	}
 
+	//// MENU MAIN
 	//______________________________________________________________________________________________
 	override fun onCreateOptionsMenu(menu: Menu): Boolean {
 		menuInflater.inflate(R.menu.menu_main, menu)
@@ -80,33 +84,75 @@ class MapaActivity : BaseActivity() {
 				return super.onOptionsItemSelected(item)
 		}
 	}
+	//// MENU CONTEXT
+	//______________________________________________________________________________________________
+	override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo)
+	{
+		super.onCreateContextMenu(menu, v, menuInfo)
+		Log.e(TAG, "onCreateContextMenu----------------------------------------------------------------")
+		menu.setHeaderTitle(getString(R.string.acciones))
+		menu.add(0, v.id, 0, getString(R.string.desde_aqui))//groupId, itemId, order, title
+		menu.add(0, v.id, 0, getString(R.string.hasta_aqui))
+	}
+	//______________________________________________________________________________________________
+	override fun onContextItemSelected(item: MenuItem): Boolean {
+		when {
+			item.title == getString(R.string.desde_aqui) -> {
+				Toast.makeText(applicationContext, "calling code", Toast.LENGTH_LONG).show()
+			}
+			item.title == getString(R.string.hasta_aqui) -> {
+				Toast.makeText(applicationContext, "sending sms code", Toast.LENGTH_LONG).show()
+			}
+			else -> return false
+		}
+		return true
+	}
 
 	//______________________________________________________________________________________________
+	/*override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+		super.onRestoreInstanceState(savedInstanceState)
+		Log.e(TAG, "onRestoreInstanceState:-------------------------------------------------")
+		//if (savedInstanceState?.containsKey(BUNDLE_PAGE) == true)page = savedInstanceState.getInt(BUNDLE_PAGE)
+	}
+	override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+		super.onRestoreInstanceState(savedInstanceState, persistentState)
+		Log.e(TAG, "onRestoreInstanceState:2-------------------------------------------------")
+	}
+	//______________________________________________________________________________________________
+	override fun onSaveInstanceState(outState: Bundle?) {
+		super.onSaveInstanceState(outState)
+		//outState?.putInt(BUNDLE_PAGE, page)
+		Log.e(TAG, "onSaveInstanceState:-------------------------------------------------")
+
+	}*/
+
 	private fun getGestureDetector() =
 		GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-		override fun onSingleTapConfirmed(me: MotionEvent): Boolean {
-			if(imgPlano.isReady)
-				singleTapConfirmed(me)
-			else
-				Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-			return true
-		}
+			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+				if(imgPlano.isReady)
+					singleTapConfirmed(e)
+				else
+					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
+				return false
+			}
 
-		override fun onLongPress(me: MotionEvent) {
-			if(imgPlano.isReady)
-				longPress(me)
-			else
-				Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-		}
+			override fun onLongPress(e: MotionEvent) {
+				if(imgPlano.isReady)
+					longPress(e)
+				else
+					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
+			}
 
-		override fun onDoubleTap(me: MotionEvent): Boolean {
-			if(imgPlano.isReady)
-				doubleTap(me)
-			else
-				Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-			return false
-		}
-	})
+			override fun onDoubleTap(e: MotionEvent): Boolean {
+				if(imgPlano.isReady)
+					doubleTap(e)
+				else
+					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
+				return false
+			}
+		})
+
+
 	//______________________________________________________________________________________________
 	private fun calcCoordenadas(x: Float, y: Float): PointF {
 		val sCoord: PointF = imgPlano.viewToSourceCoord(x, y)
@@ -125,12 +171,15 @@ class MapaActivity : BaseActivity() {
 	private fun longPress(me: MotionEvent) {
 		val sCoord = calcCoordenadas(me.x, me.y)
 		Toast.makeText(this@MapaActivity, "Long press: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
+		//TODO: Show context menu: desde aqui, hasta aqui, infoPuesto, admin:addPuesto, admin:delPuesto ...
+		viewModel.punto(sCoord)
 	}
 	//______________________________________________________________________________________________
 	private fun singleTapConfirmed(me: MotionEvent) {
 		val sCoord = calcCoordenadas(me.x, me.y)
 		Toast.makeText(this@MapaActivity, "Single tap: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
 	}
+
 
 
 	//______________________________________________________________________________________________

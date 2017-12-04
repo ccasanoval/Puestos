@@ -9,6 +9,7 @@ import com.cesoft.puestos.Log
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.data.fire.UserFire
+import com.cesoft.puestos.models.Plane
 import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
 
@@ -21,7 +22,9 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 
 	val usuario = MutableLiveData<String>()//<List<Boolean>>? = null
 	val puestos = MutableLiveData<List<Workstation>>()
+	//val markers = MutableLiveData<List<Workstation>>()
 
+	//______________________________________________________________________________________________
 	init {
 		//usuario.value = auth.getEmail()
 		puestos.value = listOf()
@@ -39,7 +42,24 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		})
 	}
 
+	//______________________________________________________________________________________________
 	fun logout() { auth.logout() }
+
+	//______________________________________________________________________________________________
+	var ini: PointF? = null
+	var end: PointF? = null
+	fun punto(pto: PointF) {
+		if(pto.x < 0 || pto.x >= 100 || pto.y < 0 || pto.y >= 100) return
+		if(ini == null) {
+			ini = pto
+
+		}
+		else {
+			end = pto
+			val map = Plane(getApplication())
+			map.calc(ini!!.x, ini!!.y, end!!.x, end!!.y)
+		}
+	}
 
 
 	companion object {

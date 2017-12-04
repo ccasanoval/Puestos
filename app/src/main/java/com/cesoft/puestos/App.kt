@@ -12,7 +12,8 @@ import com.cesoft.puestos.data.auth.Auth
 
 // PATH FINDING
 //https://stackoverflow.com/questions/25120786/a-star-algorithm-with-image-map-android
-//https://github.com/citiususc/hipster
+//https://github.com/citiususc/hipster  TOO SLOW AND MEMORY CONSUMING / java.lang.OutOfMemoryError
+//https://www.bedroomlan.org/projects/libastar IN C
 
 //INDOOR LOCATION
 //https://play.google.com/store/apps/details?id=com.microsoft.msra.followus.app
