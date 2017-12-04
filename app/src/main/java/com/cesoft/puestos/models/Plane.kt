@@ -1,16 +1,12 @@
 package com.cesoft.puestos.models
 
 import android.content.Context
+import android.graphics.PointF
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 
 import com.cesoft.puestos.Log
-import es.usc.citius.hipster.algorithm.Hipster
-import es.usc.citius.hipster.model.function.impl.StateTransitionFunction
-import es.usc.citius.hipster.model.problem.ProblemBuilder
-import es.usc.citius.hipster.util.examples.maze.Maze2D
-import es.usc.citius.hipster.util.Point
 
 
 /**
@@ -60,16 +56,16 @@ class Plane(context: Context) {
 
 		var mapX: Int = (iniX*cx/100).toInt()
 		var mapY: Int = (iniY*cy/100).toInt()
-		val ini = Point(mapX, mapY)
+		val ini = PointF(mapX.toFloat(), mapY.toFloat())
 
 		mapX = (endX*cx/100).toInt()
 		mapY = (endY*cy/100).toInt()
-		val end = Point(mapX, mapY)
+		val end = PointF(mapX.toFloat(), mapY.toFloat())
 
 		return calc(ini, end)
 	}
 	//______________________________________________________________________________________________
-	private fun calc(ini: Point, end: Point): Boolean {
+	private fun calc(ini: PointF, end: PointF): Boolean {
 		try {
 			Log.e(TAG, "calc:------------0-----------------------------------------------")
 
@@ -79,7 +75,7 @@ class Plane(context: Context) {
 			if(end.x >= data[0].length || end.x < 0) return false
 			if(end.y >= data.size || end.y < 0) return false
 
-			val iniChars = data[ini.y].replaceRange(ini.x, ini.x+1, "S")
+			/*val iniChars = data[ini.y].replaceRange(ini.x, ini.x+1, "S")
 			data[ini.y] = iniChars
 			val endChars = data[end.y].replaceRange(end.x, end.x+1, "G")
 			data[end.y] = endChars
@@ -89,29 +85,14 @@ class Plane(context: Context) {
 			for(linea in data)Log.e(TAG, linea)
 			Log.e(TAG, "calc:------------5-----------------------------------------------")
 
-			val maze = Maze2D(data.toTypedArray())
 			Log.e(TAG, "calc:------------6-----------------------------------------------")
 
-			//ini = maze.getInitialLoc()
-			//fin = maze.getGoalLoc()
-			//SearchProblem
-			val problem = ProblemBuilder.create()
-				.initialState(ini)
-				.defineProblemWithoutActions()
-				.useTransitionFunction(object : StateTransitionFunction<Point>() {
-					override fun successorsOf(state: Point): Iterable<Point> {
-						return maze.validLocationsFrom(state)
-					}
-				})
-				.useCostFunction { transition -> transition.fromState.distance(transition.state) }
-				.useHeuristicFunction { state -> state.distance(end) }
-				.build()
+
 			Log.e(TAG, "calc:------------8-----------------------------------------------")
 
 			//val res = Hipster.createAStar(problem).search(end) //Out of Memory !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			val res = Hipster.createIDAStar(problem).search(end)//idem
-			Log.e(TAG, "calc:------------999----------------------------------------->"+res)
-			System.out.println("RES: "+res)
+			*/
+			Log.e(TAG, "calc:------------999----------------------------------------->")
 			return true
 		}
 		catch(e: Exception) {
