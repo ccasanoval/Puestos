@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include <stdio.h>
+//#include <stdio.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,49 +17,63 @@
 
 using namespace std;
 
-//TODO: pasarlo como parametro a la funcion...
-const int MAP_WIDTH = 20;
-const int MAP_HEIGHT = 20;
-int world_map[ MAP_WIDTH * MAP_HEIGHT ] =
+/*const int MAP_WIDTH = 68;
+const int MAP_HEIGHT = 41;
+jbyte world_map[ MAP_WIDTH * MAP_HEIGHT ] =
 {
-// 0001020304050607080910111213141516171819
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,   // 00
-    1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,   // 01
-    1,9,9,1,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 02
-    1,9,9,1,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 03
-    1,9,1,1,1,1,9,9,1,9,1,9,1,1,1,1,9,9,1,1,   // 04
-    1,9,1,1,9,1,1,1,1,9,1,1,1,1,9,1,1,1,1,1,   // 05
-    1,9,9,9,9,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,   // 06
-    1,9,9,9,9,9,9,9,9,1,1,1,9,9,9,9,9,9,9,1,   // 07
-    1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,   // 08
-    1,9,1,9,9,9,9,9,9,9,1,1,9,9,9,9,9,9,9,1,   // 09
-    1,9,1,1,1,1,9,1,1,9,1,1,1,1,1,1,1,1,1,1,   // 10
-    1,9,9,9,9,9,1,9,1,9,1,9,9,9,9,9,1,1,1,1,   // 11
-    1,9,1,9,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 12
-    1,9,1,9,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 13
-    1,9,1,1,1,1,9,9,1,9,1,9,1,1,1,1,9,9,1,1,   // 14
-    1,9,1,1,9,1,1,1,1,9,1,1,1,1,9,1,1,1,1,1,   // 15
-    1,9,9,9,9,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,   // 16
-    1,1,9,9,9,9,9,9,9,1,1,1,9,9,9,1,9,9,9,9,   // 17
-    1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,   // 18
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,   // 19
-};
-
-// map helper functions
-
-int GetMap( int x, int y )
+//  0 1 2 3 4 5 6 7 8 910 1 2 3 4 5 6 7 8 920 1 2 3 4 5 6 7 8 930 1 2 3 4 5 6 7 8 940 1 2 3 4 5 6 7 8 950 1 2 3 4 5 6 7 8 960 1 2 3 4 5 6 7
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//0
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//1
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//2
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,9,9,9,9,9,9,9,9,9,9,9,1,1,1,//3
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,9,9,9,9,1,1,1,1,1,9,1,1,9,9,1,1,9,1,1,9,1,1,1,//4
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//5
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,9,1,1,1,//6
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,1,1,9,1,1,1,1,9,9,9,9,9,9,1,9,1,1,9,9,9,9,1,9,1,1,1,//7
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//8
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,1,1,1,9,9,1,1,1,1,9,1,1,1,1,1,1,1,9,1,9,1,1,1,//9
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//10
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,1,1,9,1,1,1,9,9,1,1,1,1,9,9,1,1,9,9,9,9,9,1,9,1,1,1,//11
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,//12
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,1,1,1,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//13
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,9,9,1,1,1,1,1,9,1,9,1,1,1,//14
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,1,1,1,9,9,9,9,9,9,9,9,1,1,1,9,9,9,9,1,9,1,1,1,//15
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,9,9,9,9,1,1,9,1,1,1,1,9,9,1,1,9,1,1,1,//16
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,1,1,9,1,1,1,//17
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,1,1,1,1,1,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,1,1,9,1,1,1,//18
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,9,9,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,9,1,1,1,//19
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,9,9,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,1,9,1,1,1,//20
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,1,1,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//21
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,1,1,1,1,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//22
+    1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,9,9,1,9,9,1,1,1,9,1,1,1,1,9,9,1,1,9,1,1,1,1,1,9,1,1,1,//23
+    1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,9,1,1,1,1,9,1,1,1,1,1,1,1,9,9,1,9,9,1,1,9,9,9,9,9,9,9,1,1,9,9,9,9,9,1,9,1,1,1,//24
+    1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,1,1,9,9,9,9,9,1,1,1,1,1,1,1,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//25
+    1,1,1,1,1,9,1,1,1,9,9,1,1,1,1,1,9,1,1,9,9,9,9,1,1,9,9,9,9,9,1,9,1,1,1,9,9,9,9,9,9,1,1,1,1,1,1,9,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//26
+    1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,9,9,9,9,9,9,9,1,1,1,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//27
+    1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,1,9,9,9,1,1,1,1,1,1,9,9,9,1,1,1,9,9,1,1,9,9,1,1,9,9,9,9,1,9,1,1,1,//28
+    1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,1,1,1,1,1,1,1,9,9,9,1,1,1,1,9,9,1,1,9,9,1,1,9,9,9,9,1,9,1,1,1,//29
+    1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//30
+    1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,1,9,9,1,1,1,9,1,1,1,1,1,1,9,9,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//31
+    1,1,1,1,1,9,1,1,9,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,9,9,1,1,1,1,9,1,9,1,9,1,1,1,//32
+    1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,9,1,1,9,1,1,9,9,9,9,9,9,1,1,9,1,1,1,1,9,9,9,9,9,9,9,9,9,1,1,1,9,9,9,9,1,9,1,1,1,//33
+    1,1,1,1,1,9,1,1,1,1,1,1,9,1,9,1,1,1,9,1,1,9,1,1,9,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,9,1,1,9,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//34
+    1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//35
+    1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,1,9,1,1,1,//36
+    1,1,1,1,1,9,9,1,1,9,1,1,9,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,9,9,9,1,9,1,1,9,1,1,1,//37
+    1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,1,//38
+    1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,//39
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//40
+};*/
+jbyte* MAP;
+int COLS;
+int ROWS;
+int GetMap( int x, int y)
 {
-    if( x < 0 ||
-        x >= MAP_WIDTH ||
-        y < 0 ||
-        y >= MAP_HEIGHT
-            )
-    {
+    if( x < 0 || x >= COLS || y < 0 || y >= ROWS)
         return 9;
-    }
-
-    return world_map[(y*MAP_WIDTH)+x];
+    return MAP[(y*COLS)+x];
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class MapSearchNode
@@ -83,23 +97,17 @@ public:
 bool MapSearchNode::IsSameState( MapSearchNode &rhs )
 {
     // same state in a maze search is simply when (x,y) are the same
-    if(x == rhs.x && y == rhs.y)
-        return true;
-    else
-        return false;
+    return x == rhs.x && y == rhs.y;
 }
 
 void MapSearchNode::PrintNodeInfo(stringstream *res)
 {
-    char str[100];
-    sprintf( str, "Node position : (%d,%d)\n", x,y );
-
-    (*res) << str;
+    //char str[100];
+    //sprintf( str, "(%d,%d)\n", x,y );
+    (*res) << "(" << x << "," << y << ")" << endl;//str;
 }
 
-// Here's the heuristic function that estimates the distance from a Node
-// to the Goal.
-
+// Here's the heuristic function that estimates the distance from a Node to the Goal.
 float MapSearchNode::GoalDistanceEstimate( MapSearchNode &nodeGoal )
 {
     return abs(x - nodeGoal.x) + abs(y - nodeGoal.y);
@@ -107,16 +115,15 @@ float MapSearchNode::GoalDistanceEstimate( MapSearchNode &nodeGoal )
 
 bool MapSearchNode::IsGoal( MapSearchNode &nodeGoal )
 {
-    if(x == nodeGoal.x && y == nodeGoal.y)
-        return true;
-    return false;
+    return x == nodeGoal.x && y == nodeGoal.y;
 }
 
-// This generates the successors to the given Node. It uses a helper function called
-// AddSuccessor to give the successors to the AStar class. The A* specific initialisation
-// is done for each node internally, so here you just set the state information that
-// is specific to the application
-bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapSearchNode *parent_node )
+// This generates the successors to the given Node. It uses a helper function called AddSuccessor
+// to give the successors to the AStar class. The A* specific initialisation is done for each node
+// internally, so here you just set the state information that is specific to the application
+bool MapSearchNode::GetSuccessors(
+        AStarSearch<MapSearchNode> *astarsearch,
+        MapSearchNode *parent_node)
 {
     int parent_x = -1;
     int parent_y = -1;
@@ -130,35 +137,29 @@ bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapS
     MapSearchNode NewNode;
 
     // push each possible move except allowing the search to go backwards
-
     if( (GetMap( x-1, y ) < 9)
-        && !((parent_x == x-1) && (parent_y == y))
-            )
+        && !((parent_x == x-1) && (parent_y == y)) )
     {
         NewNode = MapSearchNode( x-1, y );
         astarsearch->AddSuccessor( NewNode );
     }
 
     if( (GetMap( x, y-1 ) < 9)
-        && !((parent_x == x) && (parent_y == y-1))
-            )
+        && !((parent_x == x) && (parent_y == y-1)) )
     {
         NewNode = MapSearchNode( x, y-1 );
         astarsearch->AddSuccessor( NewNode );
     }
 
     if( (GetMap( x+1, y ) < 9)
-        && !((parent_x == x+1) && (parent_y == y))
-            )
+        && !((parent_x == x+1) && (parent_y == y)) )
     {
         NewNode = MapSearchNode( x+1, y );
         astarsearch->AddSuccessor( NewNode );
     }
 
-
     if( (GetMap( x, y+1 ) < 9)
-        && !((parent_x == x) && (parent_y == y+1))
-            )
+        && !((parent_x == x) && (parent_y == y+1)) )
     {
         NewNode = MapSearchNode( x, y+1 );
         astarsearch->AddSuccessor( NewNode );
@@ -180,88 +181,109 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 extern "C"
 JNIEXPORT jstring
 JNICALL
-Java_com_cesoft_puestos_util_Astar_calcMapa(JNIEnv *env, jobject)
+Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
+                                            int iniX, int iniY,
+                                            int endX, int endY,
+                                            jbyteArray map,
+                                            int cols, int rows)
 {
     //TODO: INPUT: array mapa, pos ini, pos end
     stringstream res;
     res << "INI:\n";
 
+    // ---- MAPA
+    //const jsize length = env->GetArrayLength(map);
+    //jbyteArray newArray = env->NewByteArray(length);
+    //jbyte* map2 = env->GetByteArrayElements(map, NULL);
+    MAP = env->GetByteArrayElements(map, NULL);
+
+    //
+    COLS = cols;
+    ROWS = rows;
+
+    /*res << COLS << endl << ROWS << endl;
+    for(int i=0; i < ROWS; i++) {
+        for(int j = 0; j < COLS; j++) {
+            res << MAP[i * COLS + j] << ",";
+        }
+        res << endl;
+    }
+    res << endl;
+    res << endl;
+    res << MAP_WIDTH << endl << MAP_HEIGHT << endl;
+    for(int i=0; i < MAP_HEIGHT; i++) {
+        for(int j = 0; j < MAP_WIDTH; j++) {
+            res << world_map[i * MAP_WIDTH + j] << ",";
+        }
+        res << endl;
+    }*/
+    //std::string s2 = res.str();
+    //return env->NewStringUTF(s2.c_str());
+
     //----------------------------------------------------------------------------------------------
     AStarSearch<MapSearchNode> astarsearch;
 
     unsigned int SearchCount = 0;
-
-    const unsigned int NumSearches = 1;
-
+    const unsigned int NumSearches = 1;//?
     while(SearchCount < NumSearches)
     {
-
         // Create a start state
         MapSearchNode nodeStart;
-        nodeStart.x = 0;//rand()%MAP_WIDTH;
-        nodeStart.y = 0;//rand()%MAP_HEIGHT;
+        nodeStart.x = iniX;//rand()%MAP_WIDTH;
+        nodeStart.y = iniY;//rand()%MAP_HEIGHT;
 
         // Define the goal state
         MapSearchNode nodeEnd;
-        nodeEnd.x = 7;//rand()%MAP_WIDTH;
-        nodeEnd.y = 15;//rand()%MAP_HEIGHT;
+        nodeEnd.x = endX;//rand()%MAP_WIDTH;
+        nodeEnd.y = endY;//rand()%MAP_HEIGHT;
 
         // Set Start and goal states
-
         astarsearch.SetStartAndGoalStates( nodeStart, nodeEnd );
 
         unsigned int SearchState;
         unsigned int SearchSteps = 0;
-
         do
         {
             SearchState = astarsearch.SearchStep();
-
             SearchSteps++;
         }
         while( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SEARCHING );
 
         if( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SUCCEEDED )
         {
-            res << "Search found goal state\n";
-
+            res << "OK\n";
             MapSearchNode *node = astarsearch.GetSolutionStart();
-
             int steps = 0;
-
             node->PrintNodeInfo(&res);
+            //res << "(" << (*node).x << "," << (*node).y << ")" << endl;
             for( ;; )
             {
                 node = astarsearch.GetSolutionNext();
-
                 if( !node )
                     break;
-
                 node->PrintNodeInfo(&res);
                 steps ++;
             };
-
-            res << "Solution steps " << steps << endl;
+            res << "SOLUTION:" << steps << endl;
 
             // Once you're done with the solution you can free the nodes up
             astarsearch.FreeSolutionNodes();
-
-
         }
         else if( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED )
         {
-            res << "Search terminated. Did not find goal state\n";
-
+            res << "KO\n";
         }
 
         // Display the number of loops the search went through
-        res << "SearchSteps : " << SearchSteps << "\n";
+        res << "SEARCH:" << SearchSteps << endl;
 
         SearchCount ++;
         astarsearch.EnsureMemoryFreed();
     }
 
     //----------------------------------------------------------------------------------------------
+    env->ReleaseByteArrayElements(map, MAP, 0);
+    MAP = NULL;
     res << "END\n";
 
     std::string s = res.str();
