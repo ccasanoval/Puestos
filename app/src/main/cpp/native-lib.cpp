@@ -5,6 +5,20 @@
 //#include <stdio.h>
 
 
+/* SOLUCION
+{
+    "solucion": {
+        "resultado": "ok",
+        "pasos": "999",
+        "pasoBusqueda": "999",
+        "camino": [
+            { col, row },
+            { col, row } ...
+        ]
+    }
+}
+*/
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STL A* Search implementation (C)2001 Justin Heyes-Jones
 // Modified by Cesar Casanova, 2017
@@ -53,9 +67,7 @@ bool MapSearchNode::IsSameState( MapSearchNode &rhs )
 
 void MapSearchNode::PrintNodeInfo(stringstream *res)
 {
-    //char str[100];
-    //sprintf( str, "(%d,%d)\n", x,y );
-    (*res) << "(" << x << "," << y << ")" << endl;//str;
+    (*res) << " [ \"" << x << "\", \"" << y << "\" ] " << endl;
 }
 
 // Here's the heuristic function that estimates the distance from a Node to the Goal.
@@ -139,7 +151,7 @@ Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
                                             int cols, int rows)
 {
     stringstream res;
-    res << "INI:\n";
+    res << "{ \"solucion\": { \"resultado\": " << endl;
 
     // ---- MAPA
     MAP = env->GetByteArrayElements(map, NULL);
@@ -177,7 +189,7 @@ Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
 
         if( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SUCCEEDED )
         {
-            res << "OK\n";
+            res << " \"ok\", \"camino\": [ " << endl;
             MapSearchNode *node = astarsearch.GetSolutionStart();
             int steps = 0;
             node->PrintNodeInfo(&res);
@@ -186,21 +198,22 @@ Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
                 node = astarsearch.GetSolutionNext();
                 if( !node )
                     break;
+                res << ",";
                 node->PrintNodeInfo(&res);
                 steps ++;
             };
-            res << "SOLUTION:" << steps << endl;
+            res << " ], \"pasos\":\"" << steps << "\", \"pasosBusqueda\": " << endl;
 
             // Once you're done with the solution you can free the nodes up
             astarsearch.FreeSolutionNodes();
         }
         else if( SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED )
         {
-            res << "KO\n";
+            res << " \"ko\", \"pasos\":\"0\", \"camino\":[] \"pasosBusqueda\": ";
         }
 
         // Display the number of loops the search went through
-        res << "SEARCH:" << SearchSteps << endl;
+        res << "\"" << SearchSteps << "\" } }" << endl;
 
         SearchCount ++;
         astarsearch.EnsureMemoryFreed();
@@ -209,7 +222,6 @@ Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
     //----------------------------------------------------------------------------------------------
     env->ReleaseByteArrayElements(map, MAP, 0);
     MAP = NULL;
-    res << "END\n";
 
     std::string s = res.str();
     return env->NewStringUTF(s.c_str());

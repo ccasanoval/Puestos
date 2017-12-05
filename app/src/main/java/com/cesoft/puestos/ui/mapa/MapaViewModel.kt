@@ -3,14 +3,13 @@ package com.cesoft.puestos.ui.mapa
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
 import android.graphics.PointF
 import com.cesoft.puestos.App
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.data.fire.UserFire
-import com.cesoft.puestos.models.Plane
+import com.cesoft.puestos.util.Plane
 import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
 

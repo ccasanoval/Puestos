@@ -9,10 +9,8 @@ import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
-import com.cesoft.puestos.models.Plane
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.dlg.Dlg
-import com.cesoft.puestos.util.Astar
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
