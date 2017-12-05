@@ -103,8 +103,7 @@ class MapaActivity : BaseActivity() {
 		val COLS = 68
 		val ROWS = 41
 
-		//val a: Array<java.lang.Integer> = MAP.toTypedArray()
-		Log.e("TAG--", "------>"+ AStar().calcMapa(6,21, 8,36,  MAP, COLS,ROWS))
+		Log.e("TAG--", "------>"+ Astar().calcMapa(6,21, 8,36,  MAP, COLS,ROWS))
 	}
 
 

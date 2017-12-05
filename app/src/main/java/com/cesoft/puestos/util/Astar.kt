@@ -5,14 +5,14 @@ package com.cesoft.puestos.util
  */
 class Astar {
 
-	/*external fun calcMapa(
+	external fun calcMapa(
 		iniX: Int, iniY: Int,
 		endX: Int, endY: Int,
-		mapa: Array<Byte>,
+		mapa: ByteArray,
 		cols: Int, rows: Int): String
 	companion object {
 		init {
 			System.loadLibrary("native-lib")
 		}
-	}*/
+	}
 }
