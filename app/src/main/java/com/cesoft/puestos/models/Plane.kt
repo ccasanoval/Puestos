@@ -1,30 +1,45 @@
 package com.cesoft.puestos.models
 
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.graphics.PointF
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-
 import com.cesoft.puestos.Log
+import com.cesoft.puestos.util.Astar
 
 
 /**
  * Created by ccasanova on 04/12/2017
  */
 class Plane(context: Context) {
-	private val data: MutableList<String> = mutableListOf()
+	val isReady = MutableLiveData<Boolean>()
+	private val data:  MutableList<Byte> = mutableListOf()
+	private var cols = 0
+	private var rows = 0
 
 	//______________________________________________________________________________________________
 	init {
 		var reader: BufferedReader? = null
 		try {
-			reader = BufferedReader(InputStreamReader(context.assets.open("plane.txt")))
+			reader = BufferedReader(InputStreamReader(context.assets.open("mapa.txt")))
 			var line: String? = reader.readLine()
 			while(line != null) {
-				data.add(line)
+				for(c in line) {
+
+					if(c == ',')continue
+					//else if(c == '1')
+					data.add((c - '0').toByte())
+					if(rows == 0)cols++
+				}
 				line = reader.readLine()
+				rows++
 			}
+			Log.e(TAG, "init:---------------SIZE:"+cols+"--"+rows+"--------------------------------------")
+			for(b:Byte in data)
+				Log.e(TAG, ""+b+", ")
+			isReady.value = true
 		}
 		catch(e: IOException) {
 			Log.e(TAG, "init:e:----------------------------------------------------------------",e)
@@ -36,70 +51,41 @@ class Plane(context: Context) {
 		}
 	}
 
+	//______________________________________________________________________________________________
 	private val isValid: Boolean
 	get() {
-		if(data.size < 2 || data[0].length < 2)
+		Log.e(TAG, "calc0:------------0---"+(cols*rows)+"-------------"+data.size)
+		if(data.size < 4 || data.size != cols*rows)
 			return false
-		val n = data[0].length
-		/*return data.none {
-			Log.e(TAG, "--- "+data.size+" --------------- "+n+" -----------"+it.length)
-			n != it.length }*/
 		return true
 	}
 	//______________________________________________________________________________________________
 	fun calc(iniX: Float, iniY: Float, endX: Float, endY: Float): Boolean {
-		Log.e(TAG, "calc0:------------0----------------"+data.size+" : "+ data[0].length)
+		Log.e(TAG, "calc0:------------0----------------"+data.size)
 
-		if( ! isValid)return false
-		val cy = data.size
-		val cx = data[0].length
+		if(!isValid) return false
 
-		var mapX: Int = (iniX*cx/100).toInt()
-		var mapY: Int = (iniY*cy/100).toInt()
-		val ini = PointF(mapX.toFloat(), mapY.toFloat())
+		val mapIniX: Int = (iniX*cols/100).toInt()
+		val mapIniY: Int = (iniY*rows/100).toInt()
 
-		mapX = (endX*cx/100).toInt()
-		mapY = (endY*cy/100).toInt()
-		val end = PointF(mapX.toFloat(), mapY.toFloat())
+		val mapEndX = (endX*cols/100).toInt()
+		val mapEndY = (endY*rows/100).toInt()
 
-		return calc(ini, end)
+		if(mapIniX >= cols || mapIniX < 0) return false
+		if(mapIniY >= rows || mapIniY < 0) return false
+		if(mapEndX >= cols || mapEndX < 0) return false
+		if(mapEndY >= rows || mapEndY < 0) return false
+
+		Log.e(TAG, "CALC: ------------"+mapIniX+", "+mapIniY+"  /  "+mapEndX+", "+mapEndY)
+
+
+		val res = Astar().calcMapa(mapIniX, mapIniY, mapEndX, mapEndY, data.toByteArray(), cols, rows)
+		Log.e(TAG, res)
+
+		return true
 	}
 	//______________________________________________________________________________________________
-	private fun calc(ini: PointF, end: PointF): Boolean {
-		try {
-			Log.e(TAG, "calc:------------0-----------------------------------------------")
-
-			if(!isValid) return false
-			if(ini.x >= data[0].length || ini.x < 0) return false
-			if(ini.y >= data.size || ini.y < 0) return false
-			if(end.x >= data[0].length || end.x < 0) return false
-			if(end.y >= data.size || end.y < 0) return false
-
-			/*val iniChars = data[ini.y].replaceRange(ini.x, ini.x+1, "S")
-			data[ini.y] = iniChars
-			val endChars = data[end.y].replaceRange(end.x, end.x+1, "G")
-			data[end.y] = endChars
-			//data[end.y].toCharArray()[ini.x] = 'G'
-
-			Log.e(TAG, "calc:------------4-----------------------------------------------")
-			for(linea in data)Log.e(TAG, linea)
-			Log.e(TAG, "calc:------------5-----------------------------------------------")
-
-			Log.e(TAG, "calc:------------6-----------------------------------------------")
-
-
-			Log.e(TAG, "calc:------------8-----------------------------------------------")
-
-			//val res = Hipster.createAStar(problem).search(end) //Out of Memory !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			*/
-			Log.e(TAG, "calc:------------999----------------------------------------->")
-			return true
-		}
-		catch(e: Exception) {
-			Log.e(TAG, "calc:e:----------------------------------------------------------------",e)
-			return false
-		}
-	}
+	private fun calc(ini: PointF, end: PointF): Boolean = calc(ini.x, ini.y, end.x, end.y)
 
 
 	//______________________________________________________________________________________________

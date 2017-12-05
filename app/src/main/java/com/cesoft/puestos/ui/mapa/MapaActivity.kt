@@ -9,9 +9,9 @@ import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
+import com.cesoft.puestos.models.Plane
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.dlg.Dlg
-import com.cesoft.puestos.util.AStar
 import com.cesoft.puestos.util.Astar
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
@@ -25,6 +25,7 @@ class MapaActivity : BaseActivity() {
 
 	private lateinit var viewModel : MapaViewModel
 	private lateinit var imgPlano: SubsamplingScaleImageView
+	//private var isReadyMapa = false
 
 	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +57,8 @@ class MapaActivity : BaseActivity() {
 		})
 
 
-		val MAP: ByteArray = byteArrayOf(//IntArray = intArrayOf(
+/*
+		val MAP: ByteArray = byteArrayOf(
 		//  0 1 2 3 4 5 6 7 8 910 1 2 3 4 5 6 7 8 920 1 2 3 4 5 6 7 8 930 1 2 3 4 5 6 7 8 940 1 2 3 4 5 6 7 8 950 1 2 3 4 5 6 7 8 960 1 2 3 4 5 6 7
 			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//0
 			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//1
@@ -103,7 +105,7 @@ class MapaActivity : BaseActivity() {
 		val COLS = 68
 		val ROWS = 41
 
-		Log.e("TAG--", "------>"+ Astar().calcMapa(6,21, 8,36,  MAP, COLS,ROWS))
+		Log.e("TAG--", "------>"+ Astar().calcMapa(6,21, 8,36,  MAP, COLS,ROWS))*/
 	}
 
 
@@ -179,6 +181,7 @@ class MapaActivity : BaseActivity() {
 
 	}*/
 
+	//______________________________________________________________________________________________
 	private fun getGestureDetector() =
 		GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
 			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {

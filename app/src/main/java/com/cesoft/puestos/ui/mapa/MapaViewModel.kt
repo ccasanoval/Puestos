@@ -3,6 +3,7 @@ package com.cesoft.puestos.ui.mapa
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.graphics.PointF
 import com.cesoft.puestos.App
 import com.cesoft.puestos.Log
@@ -22,6 +23,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 
 	val usuario = MutableLiveData<String>()//<List<Boolean>>? = null
 	val puestos = MutableLiveData<List<Workstation>>()
+	val plane = Plane(getApplication())
 	//val markers = MutableLiveData<List<Workstation>>()
 
 	//______________________________________________________________________________________________
@@ -52,16 +54,18 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		if(pto.x < 0 || pto.x >= 100 || pto.y < 0 || pto.y >= 100) return
 		if(ini == null) {
 			ini = pto
-
 		}
 		else {
 			end = pto
-			val map = Plane(getApplication())
-			map.calc(ini!!.x, ini!!.y, end!!.x, end!!.y)
+			//plane.isReady.observe(getApplication<App>(), Observer<Boolean>{
+			//	isReady -> if(isReady != null && isReady)
+			Log.e(TAG, "CALC: ------------"+ini!!.x+", "+ini!!.y+"  /  "+end!!.x+", "+end!!.y)
+			plane.calc(ini!!.x, ini!!.y, end!!.x, end!!.y)
+			//})
 		}
 	}
 
-
+	//______________________________________________________________________________________________
 	companion object {
 		private val TAG: String = MapaViewModel::class.java.simpleName
 	}
