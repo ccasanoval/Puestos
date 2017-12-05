@@ -11,6 +11,7 @@ import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.dlg.Dlg
+import com.cesoft.puestos.util.Astar
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
@@ -52,7 +53,11 @@ class MapaActivity : BaseActivity() {
 		viewModel.usuario.observe(this, Observer<String> {
 			usuario -> setTituloFromEmail(usuario)
 		})
+
+
+		Log.e("TAG--", "------>"+Astar().calcMapa())
 	}
+
 
 	//______________________________________________________________________________________________
 	private fun setTituloFromEmail(titulo: String?) {
