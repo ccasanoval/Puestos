@@ -26,7 +26,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var strokeWidth: Int = 0
 	private val path = Path()
 	//private var sPoints: MutableList<PointF>? = null
-	private var caminoOrg: Array<Point>? = null
+	private var caminoOrg: Array<PointF>? = null
 	private var camino: Array<PointF>? = null
 
 
@@ -66,7 +66,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		invalidate()
 	}
 	//______________________________________________________________________________________________
-	fun setCamino(valor: Array<Point>?) {
+	fun setCamino(valor: Array<PointF>?) {
 		caminoOrg = valor
 		if(!isReady || valor == null || valor.size < 2)return
 		camino = Array(valor.size, {coord100ToImg(valor[it])})
@@ -76,18 +76,17 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	}
 
 	//______________________________________________________________________________________________
-	private fun coord100ToImg(pto: Point): PointF {
-		//TODO: por que esa escala 1.5 y 2.5  ?
+	private fun coord100ToImg(pto: PointF): PointF {
 		if( ! isReady)return PointF(0f,0f)
 		//Log.e(TAG, "coord100ToImg:-----------"+isReady+"------"+sWidth+" / "+sHeight+" ::: "+pto.x+" :: "+imgIni!!.width)
-		val x = 1.417f*sWidth*pto.x / 100f + imgIni!!.width
-		val y = 2.535f*sHeight*pto.y / 100f
+		val x = pto.x *sWidth/100f
+		val y = pto.y * sHeight/100f
 		return PointF(x, y)
 	}
 	//______________________________________________________________________________________________
 	fun coordImgTo100(pto: PointF): PointF {
-		val x = 100*pto.x / sWidth
-		val y = 100*pto.y / sHeight
+		val x = pto.x *100f/sWidth
+		val y = pto.y *100f/sHeight
 		return PointF(x, y)
 	}
 

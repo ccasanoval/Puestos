@@ -4,7 +4,7 @@
 #include <iostream>
 //#include <stdio.h>
 
-
+//TODO: por que no puede salir de habitaciones con puertas pequeñas???
 /* SOLUCION
 {
     "solucion": {
@@ -144,7 +144,7 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 extern "C"
 JNIEXPORT jstring
 JNICALL
-Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
+Java_com_cesoft_puestos_util_Astar_calcMapa(JNIEnv *env, jobject,
                                             int iniX, int iniY,
                                             int endX, int endY,
                                             jbyteArray map,
@@ -228,6 +228,7 @@ Java_com_cesoft_puestos_util_AStar_calcMapa(JNIEnv *env, jobject,
     return env->NewStringUTF(s.c_str());
 }
 
+/*
 //__________________________________________________________________________________________________
 extern "C"
 JNIEXPORT jstring
@@ -243,4 +244,4 @@ Java_com_cesoft_puestos_util_Astar_calcMapa(JNIEnv *env, jobject o,
             endX, endY,
             map,
             cols, rows);
-}
+}*/

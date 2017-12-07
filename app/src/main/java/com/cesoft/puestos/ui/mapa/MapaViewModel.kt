@@ -26,7 +26,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	val mensaje = MutableLiveData<String>()
 	val usuario = MutableLiveData<String>()//<List<Boolean>>? = null
 	val puestos = MutableLiveData<List<Workstation>>()
-	val camino = MutableLiveData<Array<Point>>()
+	val camino = MutableLiveData<Array<PointF>>()
 	val ini = MutableLiveData<PointF>()
 	val end = MutableLiveData<PointF>()
 	val ini100 = PointF()

@@ -57,7 +57,7 @@ class MapaActivity : BaseActivity() {
 		viewModel.usuario.observe(this, Observer<String> {
 			usuario -> setTituloFromEmail(usuario)
 		})
-		viewModel.camino.observe(this, Observer<Array<Point>> {
+		viewModel.camino.observe(this, Observer<Array<PointF>> {
 			camino ->
 			if(camino == null)
 				Toast.makeText(this, getString(R.string.error_camino), Toast.LENGTH_LONG).show()
@@ -194,7 +194,7 @@ class MapaActivity : BaseActivity() {
 
 	////////////////// IMG VIEW
 	//______________________________________________________________________________________________
-	private fun drawCamino(camino: Array<Point>) {
+	private fun drawCamino(camino: Array<PointF>) {
 		imgPlano.setCamino(camino)
 	}
 	//______________________________________________________________________________________________

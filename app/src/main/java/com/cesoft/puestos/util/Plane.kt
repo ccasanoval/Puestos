@@ -15,14 +15,11 @@ import com.cesoft.puestos.Log
  * Created by ccasanova on 04/12/2017
  */
 class Plane(context: Context) {
-	//val isReady = MutableLiveData<Boolean>()
 	var isReady: Boolean = false
 		private set
 	private val data:  MutableList<Byte> = mutableListOf()
 	private var cols = 0
 	private var rows = 0
-
-	//data class Solucion(var isSolucion: Boolean, var data: Array<PointF>?)
 
 	//______________________________________________________________________________________________
 	init {
@@ -32,8 +29,7 @@ class Plane(context: Context) {
 			var line: String? = reader.readLine()
 			while(line != null) {
 				for(c in line) {
-
-					if(c == ',')continue
+					//if(c == ',')continue
 					data.add((c - '0').toByte())
 					if(rows == 0)cols++
 				}
@@ -65,42 +61,46 @@ class Plane(context: Context) {
 	}
 
 	//______________________________________________________________________________________________
-	fun calc(ini: PointF, end: PointF): Solucion = calc(ini.x, ini.y, end.x, end.y)
+	fun coordIn(pto: PointF): PointF {
+		val x = pto.x *cols/100f
+		val y = pto.y *rows/100f
+		return PointF(x, y)
+	}
 	//______________________________________________________________________________________________
-	fun calc(iniX: Float, iniY: Float, endX: Float, endY: Float): Solucion {
+	fun coordOut(pto: Point): PointF {
+		val x = pto.x *100f/cols
+		val y = pto.y *100f/rows
+		return PointF(x, y)
+	}
+	//______________________________________________________________________________________________
+	fun calc(ini: PointF, end: PointF): Solucion {
 		Log.e(TAG, "calc0:------------0----------------"+data.size)
 
 		val err = Solucion(false, null)
 		if(!isValid) return err
 
-		val mapIniX: Int = (iniX*cols/100).toInt()
-		val mapIniY: Int = (iniY*rows/100).toInt()
+		val iniMap = coordIn(ini)
+		val endMap = coordIn(end)
+		if(iniMap.x >= cols || iniMap.x < 0) return err
+		if(iniMap.y >= rows || iniMap.y < 0) return err
+		if(endMap.x >= cols || endMap.x < 0) return err
+		if(endMap.y >= rows || endMap.y < 0) return err
 
-		val mapEndX = (endX*cols/100).toInt()
-		val mapEndY = (endY*rows/100).toInt()
-
-		if(mapIniX >= cols || mapIniX < 0) return err
-		if(mapIniY >= rows || mapIniY < 0) return err
-		if(mapEndX >= cols || mapEndX < 0) return err
-		if(mapEndY >= rows || mapEndY < 0) return err
-
-		Log.e(TAG, "CALC: ------------"+mapIniX+", "+mapIniY+"  /  "+mapEndX+", "+mapEndY)
-		val res = Astar().calcMapa(mapIniX, mapIniY, mapEndX, mapEndY, data.toByteArray(), cols, rows)
+		Log.e(TAG, "CALC: ------------"+iniMap+" / "+endMap)
+		val res = Astar().calcMapa(iniMap, endMap, data.toByteArray(), cols, rows)
 		Log.e(TAG, res)/////*************************************
 
 		return translateRes(res)
 	}
 
+	//______________________________________________________________________________________________
 	private fun translateRes(res: String): Solucion {
-		//val err = Solucion(false, null)
 		//TODO: devolver struct ??
 		val gson = Gson()
 		val sol = gson.fromJson(res, Solucion::class.java)
 		sol.isOk = sol.resultado == "ok"
 		if(sol.isOk && sol.camino != null) {
-			sol.data = Array(sol.pasos+1, { Point(sol.camino!![it][0], sol.camino!![it][1]) })
-			//for(pto: Array<Int> in sol.camino!!)	Log.e(TAG, "---a-----"+pto[0]+","+pto[1])
-			//for(pto: Point in sol.data!!)			Log.e(TAG, "---b-----"+pto.x+","+pto.y)
+			sol.data = Array(sol.pasos+1, { coordOut(Point(sol.camino!![it][0], sol.camino!![it][1])) })
 			return sol
 		}
 		else {
@@ -121,7 +121,7 @@ class Plane(context: Context) {
         */
 	data class Solucion(
 		@Transient var isOk: Boolean,
-		@Transient var data: Array<Point>? = null)
+		@Transient var data: Array<PointF>? = null)
 	{
 		@SerializedName("resultado") var resultado: String ?= null
 		@SerializedName("camino") var camino: Array<Array<Int>> ?= null
