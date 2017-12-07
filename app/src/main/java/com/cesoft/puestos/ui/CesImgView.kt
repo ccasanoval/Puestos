@@ -1,9 +1,5 @@
 package com.cesoft.puestos.ui
 
-/**
- * Created by ccasanova on 07/12/2017
- */
-
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -12,6 +8,10 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.cesoft.puestos.R.drawable
 
 
+/**
+ * Created by ccasanova on 07/12/2017
+ */
+////////////////////////////////////////////////////////////////////////////////////////////////////
 class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet? = null)
 	: SubsamplingScaleImageView(context, attr) {
 
@@ -26,6 +26,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var strokeWidth: Int = 0
 	private val path = Path()
 	//private var sPoints: MutableList<PointF>? = null
+	private var caminoOrg: Array<Point>? = null
 	private var camino: Array<PointF>? = null
 
 
@@ -38,7 +39,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		val density = resources.displayMetrics.densityDpi.toFloat()
 		imgIni = BitmapFactory.decodeResource(this.resources, drawable.ini)
 		imgEnd = BitmapFactory.decodeResource(this.resources, drawable.end)
-
+//Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		val w = density / 420f * imgIni!!.width
 		val h = density / 420f * imgIni!!.height
 		imgIni = Bitmap.createScaledBitmap(imgIni!!, w.toInt(), h.toInt(), true)
@@ -46,30 +47,41 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 
 		strokeWidth = (density / 60f).toInt()
 	}
+	//______________________________________________________________________________________________
+	override fun onReady() {
+		super.onReady()
+		setCamino(caminoOrg)
+	}
 
 	//______________________________________________________________________________________________
 	fun setIni(pto: PointF?) {
 		this.ptoIni = pto
-		initialise()
+		//initialise()
 		invalidate()
 	}
 	//______________________________________________________________________________________________
 	fun setEnd(pto: PointF?) {
 		this.ptoEnd = pto
-		initialise()
-		invalidate()
-	}
-	fun setCamino(valor: Array<Point>) {
-		if(valor.size < 2)return
-		camino = Array(valor.size, {coord100ToImg(valor[it])})
-		initialise()
+		//initialise()
 		invalidate()
 	}
 	//______________________________________________________________________________________________
+	fun setCamino(valor: Array<Point>?) {
+		caminoOrg = valor
+		if(!isReady || valor == null || valor.size < 2)return
+		camino = Array(valor.size, {coord100ToImg(valor[it])})
+		Log.e(TAG, "setCamino:--------------------a-----"+valor.size+"----"+valor[0]+" : "+camino!![0])
+		//initialise()
+		invalidate()
+	}
+
+	//______________________________________________________________________________________________
 	private fun coord100ToImg(pto: Point): PointF {
 		//TODO: por que esa escala 1.5 y 2.5  ?
-		val x = 1.5f*sWidth*pto.x / 100f
-		val y = 2.5f*sHeight*pto.y / 100f
+		if( ! isReady)return PointF(0f,0f)
+		//Log.e(TAG, "coord100ToImg:-----------"+isReady+"------"+sWidth+" / "+sHeight+" ::: "+pto.x+" :: "+imgIni!!.width)
+		val x = 1.417f*sWidth*pto.x / 100f + imgIni!!.width
+		val y = 2.535f*sHeight*pto.y / 100f
 		return PointF(x, y)
 	}
 	//______________________________________________________________________________________________
@@ -84,14 +96,13 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
 
-		// Don't draw pin before image is ready so it doesn't move around during setup.
 		if(!isReady) return
 
 		paint.isAntiAlias = true
 
 		if(ptoIni != null) {
 			sourceToViewCoord(ptoIni!!, ptoView)
-			Log.e(TAG, "ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
+			Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
 			val vX = ptoView.x - imgIni!!.width / 2
 			val vY = ptoView.y - imgIni!!.height
 			canvas.drawBitmap(imgIni!!, vX, vY, paint)
@@ -99,7 +110,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 
 		if(ptoEnd != null) {
 			sourceToViewCoord(ptoEnd!!, ptoView)
-			Log.e(TAG, "end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
+			Log.e(TAG, "onDraw:end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
 			val vX = ptoView.x - imgEnd!!.width / 2
 			val vY = ptoView.y - imgEnd!!.height
 			canvas.drawBitmap(imgEnd!!, vX, vY, paint)
@@ -109,12 +120,10 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			path.reset()
 			sourceToViewCoord(camino!![0].x, camino!![0].y, preView)
 			path.moveTo(preView.x, preView.y)
-			Log.e(TAG, "camino:-----------------------src:"+camino!![0]+" : view:"+preView)
-
+			Log.e(TAG, "onDraw:camino:-----------------------src:"+camino!![0]+" : view:"+preView)
 			for(i in 1 until camino!!.size) {
 				sourceToViewCoord(camino!![i].x, camino!![i].y, ptoView)
-				Log.e(TAG, "camino:-----------------------src:"+camino!![i]+" : view:"+ptoView)
-
+				//Log.e(TAG, "camino:-----------------------src:"+camino!![i]+" : view:"+ptoView)
 				path.quadTo(preView.x, preView.y, (ptoView.x + preView.x) / 2, (ptoView.y + preView.y) / 2)
 				preView = ptoView
 			}

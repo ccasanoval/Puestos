@@ -7,6 +7,7 @@ import android.graphics.Point
 import android.graphics.PointF
 import com.cesoft.puestos.App
 import com.cesoft.puestos.Log
+import com.cesoft.puestos.R
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.data.fire.UserFire
@@ -22,6 +23,7 @@ import com.cesoft.puestos.ui.CesImgView
 class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	private val auth: Auth = getApplication<App>().auth
 
+	val mensaje = MutableLiveData<String>()
 	val usuario = MutableLiveData<String>()//<List<Boolean>>? = null
 	val puestos = MutableLiveData<List<Workstation>>()
 	val camino = MutableLiveData<Array<Point>>()
@@ -30,11 +32,9 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	val ini100 = PointF()
 	val end100 = PointF()
 	val plane = Plane(getApplication())
-	//val markers = MutableLiveData<List<Workstation>>()
 
 	//______________________________________________________________________________________________
 	init {
-		//usuario.value = auth.getEmail()
 		puestos.value = listOf()
 		val fire = Fire()
 		val userFire = UserFire()
@@ -45,7 +45,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 			else {
 				usuario.value = auth.getEmail()
-				Log.e(TAG, "init:userFire.get:e:--------------------"+auth.getEmail().toString(), error)
+				Log.e(TAG, "init:userFire.get:e:---------------------------------------------"+auth.getEmail().toString(), error)
 			}
 		})
 	}
@@ -56,9 +56,10 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	//______________________________________________________________________________________________
 	fun punto(pto: PointF, img: CesImgView) {
 		val pto100 = img.coordImgTo100(pto)
-		Log.e(TAG, "punto:-----0-----------"+pto100+" :: "+ini.value+" : "+end.value)
+		//Log.e(TAG, "punto:-----0-----------"+pto100+" :: "+ini.value+" : "+end.value)
 
 		if(pto100.x < 0 || pto100.x >= 100 || pto100.y < 0 || pto100.y >= 100) {
+			mensaje.value = getApplication<App>().getString(R.string.error_outside_bounds)
 			Log.e(TAG, "punto:e:out of boundaries--------------"+pto+" : "+pto100+" :: "+ini.value+" : "+end.value)
 			return
 		}
@@ -74,15 +75,6 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			camino.value = sol.data
 		}
 	}
-
-	//______________________________________________________________________________________________
-	//TODO: to CesImgView
-//	private fun coordImgTo100(pto: PointF, imgSize: Point): PointF {
-//		val x1 = 100*pto.x / imgSize.x
-//		val y1 = 100*pto.y / imgSize.y
-//		return PointF(x1, y1)
-//	}
-
 
 	//______________________________________________________________________________________________
 	companion object {

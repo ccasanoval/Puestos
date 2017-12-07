@@ -16,5 +16,6 @@
     <string name="hasta_aqui">Hasta aquí…</string>
     <string name="acciones">Acciones:</string>
     <string name="error_camino">No se puede calcular el camino</string>
+    <string name="error_outside_bounds">El punto elegido está fuera del plano</string>
 
 </resources>

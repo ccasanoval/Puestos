@@ -51,6 +51,9 @@ class MapaActivity : BaseActivity() {
 		///////////// ViewModel Observers
 		//
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
+		viewModel.mensaje.observe(this, Observer {
+			mensaje -> Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
+		})
 		viewModel.usuario.observe(this, Observer<String> {
 			usuario -> setTituloFromEmail(usuario)
 		})
@@ -70,15 +73,12 @@ class MapaActivity : BaseActivity() {
 		////////////
 	}
 
-
 	//______________________________________________________________________________________________
 	private fun setTituloFromEmail(titulo: String?) {
 		if(titulo!=null) {
 			val i = titulo.indexOf('@')
-			title = if(i > 0)
-				titulo.substring(0, i)
-			else
-				titulo
+			title = if(i > 0) titulo.substring(0, i)
+					else titulo
 		}
 	}
 
