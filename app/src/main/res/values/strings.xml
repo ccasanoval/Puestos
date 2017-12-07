@@ -12,8 +12,9 @@
     <string name="campo_obligatorio">Campo obligatorio</string>
     <string name="ok_login">Usuario: %1$s (verificado: %2$b)</string>
     <string name="seguro_logout">¿Seguro que desea cerrar sesión?</string>
-    <string name="desde_aqui">Desde aquí...</string>
-    <string name="hasta_aqui">Hasta aquí...</string>
+    <string name="desde_aqui">Desde aquí…</string>
+    <string name="hasta_aqui">Hasta aquí…</string>
     <string name="acciones">Acciones:</string>
+    <string name="error_camino">No se puede calcular el camino</string>
 
 </resources>

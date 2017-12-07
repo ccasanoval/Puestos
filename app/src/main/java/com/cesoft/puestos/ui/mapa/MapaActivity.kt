@@ -2,6 +2,7 @@ package com.cesoft.puestos.ui.mapa
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.graphics.Point
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
 import android.os.Bundle
@@ -10,9 +11,9 @@ import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.ui.BaseActivity
+import com.cesoft.puestos.ui.CesImgView
 import com.cesoft.puestos.ui.dlg.Dlg
 import com.davemorrissey.labs.subscaleview.ImageSource
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
 
 /**
@@ -22,14 +23,13 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 class MapaActivity : BaseActivity() {
 
 	private lateinit var viewModel : MapaViewModel
-	private lateinit var imgPlano: SubsamplingScaleImageView
+	private lateinit var imgPlano: CesImgView
 	//private var isReadyMapa = false
 
 	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)//BaseActivity@onCreate(savedInstanceState)
 		setContentView(R.layout.act_main)
-		Log.e(TAG, "onCreate----------2------------------------")
 
 		val toolbar: Toolbar = findViewById(R.id.toolbar)
 		setSupportActionBar(toolbar)
@@ -48,62 +48,26 @@ class MapaActivity : BaseActivity() {
 
 		registerForContextMenu(imgPlano)
 
-		/// ViewModel
+		///////////// ViewModel Observers
+		//
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
 		viewModel.usuario.observe(this, Observer<String> {
 			usuario -> setTituloFromEmail(usuario)
 		})
-
-
-/*
-		val MAP: ByteArray = byteArrayOf(
-		//  0 1 2 3 4 5 6 7 8 910 1 2 3 4 5 6 7 8 920 1 2 3 4 5 6 7 8 930 1 2 3 4 5 6 7 8 940 1 2 3 4 5 6 7 8 950 1 2 3 4 5 6 7 8 960 1 2 3 4 5 6 7
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//0
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//1
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,//2
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,9,9,9,9,9,9,9,9,9,9,9,1,1,1,//3
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,9,9,9,9,1,1,1,1,1,9,1,1,9,9,1,1,9,1,1,9,1,1,1,//4
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//5
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,9,1,1,1,//6
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,1,1,9,1,1,1,1,9,9,9,9,9,9,1,9,1,1,9,9,9,9,1,9,1,1,1,//7
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//8
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,1,1,1,9,9,1,1,1,1,9,1,1,1,1,1,1,1,9,1,9,1,1,1,//9
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//10
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,1,1,9,1,1,1,9,9,1,1,1,1,9,9,1,1,9,9,9,9,9,1,9,1,1,1,//11
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,//12
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,1,1,1,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//13
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,9,9,9,1,1,1,1,1,9,1,9,1,1,1,//14
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,1,1,1,9,9,9,9,9,9,9,9,1,1,1,9,9,9,9,1,9,1,1,1,//15
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,9,9,9,9,1,1,9,1,1,1,1,9,9,1,1,9,1,1,1,//16
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,1,1,9,1,1,1,//17
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,1,1,1,1,1,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,1,1,9,1,1,1,//18
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,9,9,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,9,1,1,1,//19
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,9,9,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,1,9,1,1,1,//20
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,1,1,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//21
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,9,9,9,9,1,1,1,1,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//22
-			1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,9,9,1,9,9,1,1,1,9,1,1,1,1,9,9,1,1,9,1,1,1,1,1,9,1,1,1,//23
-			1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,9,1,1,1,1,9,1,1,1,1,1,1,1,9,9,1,9,9,1,1,9,9,9,9,9,9,9,1,1,9,9,9,9,9,1,9,1,1,1,//24
-			1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,1,9,1,1,1,1,1,1,9,9,9,9,9,1,1,1,1,1,1,1,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//25
-			1,1,1,1,1,9,1,1,1,9,9,1,1,1,1,1,9,1,1,9,9,9,9,1,1,9,9,9,9,9,1,9,1,1,1,9,9,9,9,9,9,1,1,1,1,1,1,9,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//26
-			1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,9,9,9,9,9,9,9,1,1,1,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//27
-			1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,1,9,9,9,1,1,1,1,1,1,9,9,9,1,1,1,9,9,1,1,9,9,1,1,9,9,9,9,1,9,1,1,1,//28
-			1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,1,1,1,1,1,1,1,9,9,9,1,1,1,1,9,9,1,1,9,9,1,1,9,9,9,9,1,9,1,1,1,//29
-			1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//30
-			1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,1,1,1,1,1,1,9,9,1,1,1,9,1,1,1,1,1,1,9,9,9,9,1,1,1,1,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//31
-			1,1,1,1,1,9,1,1,9,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,9,9,1,1,1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,9,9,1,1,1,1,9,1,9,1,9,1,1,1,//32
-			1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,9,1,1,9,1,1,9,9,9,9,9,9,1,1,9,1,1,1,1,9,9,9,9,9,9,9,9,9,1,1,1,9,9,9,9,1,9,1,1,1,//33
-			1,1,1,1,1,9,1,1,1,1,1,1,9,1,9,1,1,1,9,1,1,9,1,1,9,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,9,1,1,9,9,9,1,1,1,1,1,1,1,1,9,1,1,1,//34
-			1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,//35
-			1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,1,9,1,1,1,//36
-			1,1,1,1,1,9,9,1,1,9,1,1,9,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,1,1,1,1,1,1,9,9,9,9,1,9,1,1,9,1,1,1,//37
-			1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,9,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,9,1,1,9,1,1,1,//38
-			1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,//39
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1//40
-		)
-		val COLS = 68
-		val ROWS = 41
-
-		Log.e("TAG--", "------>"+ Astar().calcMapa(6,21, 8,36,  MAP, COLS,ROWS))*/
+		viewModel.camino.observe(this, Observer<Array<Point>> {
+			camino ->
+			if(camino == null)
+				Toast.makeText(this, getString(R.string.error_camino), Toast.LENGTH_LONG).show()
+			else
+				drawCamino(camino)
+		})
+		viewModel.ini.observe(this, Observer<PointF>{
+			pto -> drawIni(pto)
+		})
+		viewModel.end.observe(this, Observer<PointF>{
+			pto -> drawEnd(pto)
+		})
+		////////////
 	}
 
 
@@ -111,10 +75,10 @@ class MapaActivity : BaseActivity() {
 	private fun setTituloFromEmail(titulo: String?) {
 		if(titulo!=null) {
 			val i = titulo.indexOf('@')
-			if(i > 0)
-				title = titulo.substring(0, i)
+			title = if(i > 0)
+				titulo.substring(0, i)
 			else
-				title = titulo
+				titulo
 		}
 	}
 
@@ -151,10 +115,10 @@ class MapaActivity : BaseActivity() {
 	override fun onContextItemSelected(item: MenuItem): Boolean {
 		when {
 			item.title == getString(R.string.desde_aqui) -> {
-				Toast.makeText(applicationContext, "calling code", Toast.LENGTH_LONG).show()
+				Toast.makeText(applicationContext, "aaaaaaaaaaa", Toast.LENGTH_LONG).show()
 			}
 			item.title == getString(R.string.hasta_aqui) -> {
-				Toast.makeText(applicationContext, "sending sms code", Toast.LENGTH_LONG).show()
+				Toast.makeText(applicationContext, "bbbbbbbbbbb", Toast.LENGTH_LONG).show()
 			}
 			else -> return false
 		}
@@ -207,33 +171,40 @@ class MapaActivity : BaseActivity() {
 		})
 
 
-	//______________________________________________________________________________________________
-	private fun calcCoordenadas(x: Float, y: Float): PointF {
-		val sCoord: PointF = imgPlano.viewToSourceCoord(x, y)
-		val x1 = 100*sCoord.x / imgPlano.sWidth
-		val y1 = 100*sCoord.y / imgPlano.sHeight
-		Log.e(TAG, "------------------"+x+" : "+x1+" : "+imgPlano.sWidth)
-		return PointF(x1, y1)
-	}
+
 
 	//______________________________________________________________________________________________
 	private fun doubleTap(me: MotionEvent) {
-		val sCoord = imgPlano.viewToSourceCoord(me.x, me.y)
-		Toast.makeText(this@MapaActivity, "Double tap: " + sCoord.x.toInt() + ", " + sCoord.y.toInt(), Toast.LENGTH_SHORT).show()
+		//val sCoord = imgPlano.viewToSourceCoord(me.x, me.y)
+		//Toast.makeText(this@MapaActivity, "Double tap: " + sCoord.x.toInt() + ", " + sCoord.y.toInt(), Toast.LENGTH_SHORT).show()
 	}
 	//______________________________________________________________________________________________
 	private fun longPress(me: MotionEvent) {
-		val sCoord = calcCoordenadas(me.x, me.y)
-		Toast.makeText(this@MapaActivity, "Long press: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
+		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
+		viewModel.punto(PointF(pto.x, pto.y), imgPlano)
+		Toast.makeText(this@MapaActivity, "Long press: "+pto.x+", "+pto.y, Toast.LENGTH_SHORT).show()
 		//TODO: Show context menu: desde aqui, hasta aqui, infoPuesto, admin:addPuesto, admin:delPuesto ...
-		viewModel.punto(sCoord)
 	}
 	//______________________________________________________________________________________________
 	private fun singleTapConfirmed(me: MotionEvent) {
-		val sCoord = calcCoordenadas(me.x, me.y)
-		Toast.makeText(this@MapaActivity, "Single tap: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
+		//val sCoord = calcCoordenadas(me.x, me.y)
+		//Toast.makeText(this@MapaActivity, "Single tap: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
 	}
 
+
+	////////////////// IMG VIEW
+	//______________________________________________________________________________________________
+	private fun drawCamino(camino: Array<Point>) {
+		imgPlano.setCamino(camino)
+	}
+	//______________________________________________________________________________________________
+	private fun drawIni(pto: PointF?) {
+		imgPlano.setIni(pto)
+	}
+	//______________________________________________________________________________________________
+	private fun drawEnd(pto: PointF?) {
+		imgPlano.setEnd(pto)
+	}
 
 
 	//______________________________________________________________________________________________

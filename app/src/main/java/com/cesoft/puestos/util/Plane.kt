@@ -1,10 +1,13 @@
 package com.cesoft.puestos.util
 
 import android.content.Context
+import android.graphics.Point
 import android.graphics.PointF
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.cesoft.puestos.Log
 
 
@@ -19,7 +22,7 @@ class Plane(context: Context) {
 	private var cols = 0
 	private var rows = 0
 
-	data class Solucion(var isSolucion: Boolean, var data: Array<PointF>?)
+	//data class Solucion(var isSolucion: Boolean, var data: Array<PointF>?)
 
 	//______________________________________________________________________________________________
 	init {
@@ -60,6 +63,9 @@ class Plane(context: Context) {
 			return false
 		return true
 	}
+
+	//______________________________________________________________________________________________
+	fun calc(ini: PointF, end: PointF): Solucion = calc(ini.x, ini.y, end.x, end.y)
 	//______________________________________________________________________________________________
 	fun calc(iniX: Float, iniY: Float, endX: Float, endY: Float): Solucion {
 		Log.e(TAG, "calc0:------------0----------------"+data.size)
@@ -79,45 +85,50 @@ class Plane(context: Context) {
 		if(mapEndY >= rows || mapEndY < 0) return err
 
 		Log.e(TAG, "CALC: ------------"+mapIniX+", "+mapIniY+"  /  "+mapEndX+", "+mapEndY)
-
 		val res = Astar().calcMapa(mapIniX, mapIniY, mapEndX, mapEndY, data.toByteArray(), cols, rows)
-		Log.e(TAG, res)
+		Log.e(TAG, res)/////*************************************
 
 		return translateRes(res)
 	}
-	//______________________________________________________________________________________________
-	//private fun calc(ini: PointF, end: PointF): Boolean = calc(ini.x, ini.y, end.x, end.y)
 
 	private fun translateRes(res: String): Solucion {
-		val err = Solucion(false, null)
-		/*if(res.indexOf("OK") > 0 && res.indexOf("SOLUTION:") > 0) {
-			var r = res
-			var i = res.indexOf("(")
-			var j: Int = 0
-			while(r.isNotEmpty() && i >= 0) {
-				//r = r.substring(i+1)
-				j = r.indexOf(',', i+1)
-				if(j < 0)return err
-				val x = r.substring(i+1, j).toInt()
-				i = r.indexOf(')', j+1)
-				if(j < 0)return err
-			}
-
-		}*/
-		//TODO: Parsear json
-		/*
-		 { "solucion": { "resultado":
-			  "ok", "camino": [
+		//val err = Solucion(false, null)
+		//TODO: devolver struct ??
+		val gson = Gson()
+		val sol = gson.fromJson(res, Solucion::class.java)
+		sol.isOk = sol.resultado == "ok"
+		if(sol.isOk && sol.camino != null) {
+			sol.data = Array(sol.pasos+1, { Point(sol.camino!![it][0], sol.camino!![it][1]) })
+			//for(pto: Array<Int> in sol.camino!!)	Log.e(TAG, "---a-----"+pto[0]+","+pto[1])
+			//for(pto: Point in sol.data!!)			Log.e(TAG, "---b-----"+pto.x+","+pto.y)
+			return sol
+		}
+		else {
+			Log.e(TAG, "err--------------------------------------"+sol.resultado+":\n"+res)
+			return Solucion(false, null)
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*
+		 { "solucion": {
+		  	"resultado": "ok",
+		  	 "camino": [
 			  [ "15", "26" ]
 			 , [ "15", "27" ]
 		   ..........................
-			 , [ "60", "34" ]
 			 , [ "61", "34" ]
-			  ], "pasos":"56", "pasosBusqueda":
-			 "187" } }
+			  ], "pasos":"56", "pasosBusqueda": "187" } }
         */
-		return Solucion(false, null)
+	data class Solucion(
+		@Transient var isOk: Boolean,
+		@Transient var data: Array<Point>? = null)
+	{
+		@SerializedName("resultado") var resultado: String ?= null
+		@SerializedName("camino") var camino: Array<Array<Int>> ?= null
+		@SerializedName("pasos") val pasos: Int = 0
+		@SerializedName("pasosBusqueda") val pasosBusqueda: Int = 0
 	}
+
 
 	//______________________________________________________________________________________________
 	companion object {
