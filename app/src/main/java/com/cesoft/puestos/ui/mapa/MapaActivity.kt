@@ -2,7 +2,6 @@ package com.cesoft.puestos.ui.mapa
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.graphics.Point
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
 import android.os.Bundle
@@ -60,7 +59,7 @@ class MapaActivity : BaseActivity() {
 		viewModel.camino.observe(this, Observer<Array<PointF>> {
 			camino ->
 			if(camino == null)
-				Toast.makeText(this, getString(R.string.error_camino), Toast.LENGTH_LONG).show()
+				delCamino()
 			else
 				drawCamino(camino)
 		})
@@ -146,13 +145,13 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	private fun getGestureDetector() =
 		GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-				if(imgPlano.isReady)
-					singleTapConfirmed(e)
-				else
-					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-				return false
-			}
+//			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+//				if(imgPlano.isReady)
+//					singleTapConfirmed(e)
+//				else
+//					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
+//				return false
+//			}
 
 			override fun onLongPress(e: MotionEvent) {
 				if(imgPlano.isReady)
@@ -161,41 +160,44 @@ class MapaActivity : BaseActivity() {
 					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
 			}
 
-			override fun onDoubleTap(e: MotionEvent): Boolean {
-				if(imgPlano.isReady)
-					doubleTap(e)
-				else
-					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-				return false
-			}
+//			override fun onDoubleTap(e: MotionEvent): Boolean {
+//				if(imgPlano.isReady)
+//					doubleTap(e)
+//				else
+//					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
+//				return false
+//			}
 		})
 
 
 
 
 	//______________________________________________________________________________________________
-	private fun doubleTap(me: MotionEvent) {
+	/*private fun doubleTap(me: MotionEvent) {
 		//val sCoord = imgPlano.viewToSourceCoord(me.x, me.y)
 		//Toast.makeText(this@MapaActivity, "Double tap: " + sCoord.x.toInt() + ", " + sCoord.y.toInt(), Toast.LENGTH_SHORT).show()
-	}
+	}*/
 	//______________________________________________________________________________________________
 	private fun longPress(me: MotionEvent) {
 		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
 		viewModel.punto(PointF(pto.x, pto.y), imgPlano)
-		Toast.makeText(this@MapaActivity, "Long press: "+pto.x+", "+pto.y, Toast.LENGTH_SHORT).show()
+		//Toast.makeText(this@MapaActivity, "Long press: "+pto.x+", "+pto.y, Toast.LENGTH_SHORT).show()
 		//TODO: Show context menu: desde aqui, hasta aqui, infoPuesto, admin:addPuesto, admin:delPuesto ...
 	}
 	//______________________________________________________________________________________________
-	private fun singleTapConfirmed(me: MotionEvent) {
-		//val sCoord = calcCoordenadas(me.x, me.y)
-		//Toast.makeText(this@MapaActivity, "Single tap: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
-	}
+//	private fun singleTapConfirmed(me: MotionEvent) {
+//		//val sCoord = calcCoordenadas(me.x, me.y)
+//		//Toast.makeText(this@MapaActivity, "Single tap: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
+//	}
 
 
 	////////////////// IMG VIEW
 	//______________________________________________________________________________________________
 	private fun drawCamino(camino: Array<PointF>) {
 		imgPlano.setCamino(camino)
+	}
+	private fun delCamino() {
+		imgPlano.delCamino()
 	}
 	//______________________________________________________________________________________________
 	private fun drawIni(pto: PointF?) {

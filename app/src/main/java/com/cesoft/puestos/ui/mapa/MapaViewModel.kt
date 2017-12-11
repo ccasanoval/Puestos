@@ -3,7 +3,6 @@ package com.cesoft.puestos.ui.mapa
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.graphics.Point
 import android.graphics.PointF
 import com.cesoft.puestos.App
 import com.cesoft.puestos.Log
@@ -58,6 +57,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		val pto100 = img.coordImgTo100(pto)
 		//Log.e(TAG, "punto:-----0-----------"+pto100+" :: "+ini.value+" : "+end.value)
 
+		camino.value = null
 		if(pto100.x < 0 || pto100.x >= 100 || pto100.y < 0 || pto100.y >= 100) {
 			mensaje.value = getApplication<App>().getString(R.string.error_outside_bounds)
 			Log.e(TAG, "punto:e:out of boundaries--------------"+pto+" : "+pto100+" :: "+ini.value+" : "+end.value)
@@ -73,6 +73,8 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			end.value = pto
 			val sol = plane.calc(ini100, end100)
 			camino.value = sol.data
+			if(sol.data == null)
+				mensaje.value = getApplication<App>().getString(R.string.error_camino)
 		}
 	}
 

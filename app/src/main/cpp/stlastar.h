@@ -46,8 +46,7 @@ using namespace std;
 // Uses std new and delete instead if you turn it off
 #define USE_FSA_MEMORY 1
 
-// disable warning that debugging information has lines that are truncated
-// occurs in stl headers
+// disable warning that debugging information has lines that are truncated occurs in stl headers
 #if defined(WIN32) && defined(_WINDOWS)
 #pragma warning( disable : 4786 )
 #endif
@@ -100,8 +99,7 @@ public: // data
 	};
 
 
-	// For sorting the heap the STL needs compare function that lets us compare
-	// the f value of two nodes
+	// For sorting the heap the STL needs compare function that lets us compare the f value of two nodes
 
 	class HeapCompare_f 
 	{
@@ -122,7 +120,7 @@ public: // methods
 		m_State( SEARCH_STATE_NOT_INITIALISED ),
 		m_CurrentSolutionNode( NULL ),
 #if USE_FSA_MEMORY
-		m_FixedSizeAllocator( 1000 ),
+		m_FixedSizeAllocator( 3000 ), //La aumento para encontrar caminos largos
 #endif
 		m_AllocateNodeCount(0),
 		m_CancelRequest( false )
@@ -401,8 +399,7 @@ public: // methods
 
 	}
 
-	// User calls this to add a successor to a list of successors
-	// when expanding the search frontier
+	// User calls this to add a successor to a list of successors when expanding the search frontier
 	bool AddSuccessor( UserState &State )
 	{
 		Node *node = AllocateNode();
@@ -420,8 +417,7 @@ public: // methods
 	}
 
 	// Free the solution nodes
-	// This is done to clean up all used Node memory when you are done with the
-	// search
+	// This is done to clean up all used Node memory when you are done with the search
 	void FreeSolutionNodes()
 	{
 		Node *n = m_Start;
@@ -443,8 +439,7 @@ public: // methods
 		}
 		else
 		{
-			// if the start node is the solution we need to just delete the start and goal
-			// nodes
+			// if the start node is the solution we need to just delete the start and goal nodes
 			FreeNode( m_Start );
 			FreeNode( m_Goal );
 		}
@@ -632,8 +627,7 @@ public: // methods
 
 private: // methods
 
-	// This is called when a search fails or is cancelled to free all used
-	// memory 
+	// This is called when a search fails or is cancelled to free all used memory 
 	void FreeAllNodes()
 	{
 		// iterate open list and delete all nodes
@@ -666,9 +660,8 @@ private: // methods
 	}
 
 
-	// This call is made by the search class when the search ends. A lot of nodes may be
-	// created that are still present when the search ends. They will be deleted by this 
-	// routine once the search ends
+	// This call is made by the search class when the search ends. A lot of nodes may be created
+	// that are still present when the search ends. They will be deleted by this routine once the search ends
 	void FreeUnusedNodes()
 	{
 		// iterate open list and delete unused nodes
@@ -750,8 +743,7 @@ private: // data
 	// Closed list is a vector.
 	vector< Node * > m_ClosedList; 
 
-	// Successors is a vector filled out by the user each type successors to a node
-	// are generated
+	// Successors is a vector filled out by the user each type successors to a node are generated
 	vector< Node * > m_Successors;
 
 	// State
@@ -771,8 +763,7 @@ private: // data
  	FixedSizeAllocator<Node> m_FixedSizeAllocator;
 #endif
 	
-	//Debug : need to keep these two iterators around
-	// for the user Dbg functions
+	//Debug : need to keep these two iterators around for the user Dbg functions
 	typename vector< Node * >::iterator iterDbgOpen;
 	typename vector< Node * >::iterator iterDbgClosed;
 

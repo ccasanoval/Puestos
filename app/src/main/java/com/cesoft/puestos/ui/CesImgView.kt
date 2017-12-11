@@ -74,6 +74,12 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		//initialise()
 		invalidate()
 	}
+	//______________________________________________________________________________________________
+	fun delCamino() {
+		camino = Array(0, { PointF(0f,0f) })
+		caminoOrg = camino
+		invalidate()
+	}
 
 	//______________________________________________________________________________________________
 	private fun coord100ToImg(pto: PointF): PointF {
@@ -99,6 +105,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 
 		paint.isAntiAlias = true
 
+		/// PTO INICIO
 		if(ptoIni != null) {
 			sourceToViewCoord(ptoIni!!, ptoView)
 			Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
@@ -107,6 +114,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			canvas.drawBitmap(imgIni!!, vX, vY, paint)
 		}
 
+		/// PTO DESTINO
 		if(ptoEnd != null) {
 			sourceToViewCoord(ptoEnd!!, ptoView)
 			Log.e(TAG, "onDraw:end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
@@ -115,6 +123,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			canvas.drawBitmap(imgEnd!!, vX, vY, paint)
 		}
 
+		/// CAMINO
+		path.reset()
 		if(camino != null && camino!!.size >= 2) {
 			path.reset()
 			sourceToViewCoord(camino!![0].x, camino!![0].y, preView)

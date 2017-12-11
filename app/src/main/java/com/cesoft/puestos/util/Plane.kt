@@ -14,6 +14,7 @@ import com.cesoft.puestos.Log
 /**
  * Created by ccasanova on 04/12/2017
  */
+////////////////////////////////////////////////////////////////////////////////////////////////////
 class Plane(context: Context) {
 	var isReady: Boolean = false
 		private set
@@ -54,7 +55,7 @@ class Plane(context: Context) {
 	//______________________________________________________________________________________________
 	private val isValid: Boolean
 	get() {
-		Log.e(TAG, "calc0:------------0---"+(cols*rows)+"-------------"+data.size)
+		Log.e(TAG, "isValid:------------0---"+(cols*rows)+"-------------"+data.size)
 		if(!isReady || data.size < 4 || data.size != cols*rows)
 			return false
 		return true
@@ -86,11 +87,33 @@ class Plane(context: Context) {
 		if(endMap.x >= cols || endMap.x < 0) return err
 		if(endMap.y >= rows || endMap.y < 0) return err
 
-		Log.e(TAG, "CALC: ------------"+iniMap+" / "+endMap)
+		iniMap.set(evitarMuros(iniMap))
+		endMap.set(evitarMuros(endMap))
+
+		Log.e(TAG, "CALC: ------------"+iniMap+" === "+data[iniMap.y.toInt()*cols+iniMap.x.toInt()]+" / "+endMap +" === "+data[endMap.y.toInt()*cols+endMap.x.toInt()])
 		val res = Astar().calcMapa(iniMap, endMap, data.toByteArray(), cols, rows)
 		Log.e(TAG, res)/////*************************************
 
 		return translateRes(res)
+	}
+	//______________________________________________________________________________________________
+	private fun evitarMuros(ptoIn: PointF): PointF {
+		val ptoOut = PointF()
+		ptoOut.set(ptoIn)
+		val nueve: Byte = 9
+		if(data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()] == nueve) {
+			if(ptoOut.x-1 >= 0 && data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()-1] != nueve)
+				ptoOut.x -= 1
+			else if(ptoOut.x+1 < cols && data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()+1] != nueve)
+				ptoOut.x += 1
+			else if(ptoOut.y-1 >= 0 && data[(ptoOut.y.toInt()-1)*cols+ptoOut.x.toInt()] != nueve)
+				ptoOut.y -= 1
+			else if(ptoOut.y+1 < rows && data[(ptoOut.y.toInt()+1)*cols+ptoOut.x.toInt()] != nueve)
+				ptoOut.y += 1
+			else
+				Log.e(TAG, "Error: diste con pared ................Avisar a usuario......................."+ptoIn)
+		}
+		return ptoOut
 	}
 
 	//______________________________________________________________________________________________
@@ -132,6 +155,6 @@ class Plane(context: Context) {
 
 	//______________________________________________________________________________________________
 	companion object {
-		private val TAG: String = Map::class.java.simpleName
+		private val TAG: String = Plane::class.java.simpleName
 	}
 }
