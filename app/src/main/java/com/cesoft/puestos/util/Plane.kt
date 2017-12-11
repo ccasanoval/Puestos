@@ -37,7 +37,7 @@ class Plane(context: Context) {
 				line = reader.readLine()
 				rows++
 			}
-			//Log.e(TAG, "init:---------------SIZE:"+cols+"--"+rows+"--------------------------------------")
+			Log.e(TAG, "init:---------------SIZE:"+cols+"--"+rows+"--------------------------------------")
 			//for(b:Byte in data)Log.e(TAG, ""+b+", ")
 			isReady = true
 		}

@@ -119,6 +119,28 @@ bool MapSearchNode::GetSuccessors(
         astarsearch->AddSuccessor( NewNode );
     }
 
+    //TEST CES: Movimientos Diagonales
+    if( (GetMap( x-1, y-1 ) < 9) && !((parent_x == x-1) && (parent_y == y-1)) )
+    {
+        NewNode = MapSearchNode( x-1, y-1 );
+        astarsearch->AddSuccessor( NewNode );
+    }
+    if( (GetMap( x+1, y-1 ) < 9) && !((parent_x == x+1) && (parent_y == y-1)) )
+    {
+        NewNode = MapSearchNode( x+1, y-1 );
+        astarsearch->AddSuccessor( NewNode );
+    }
+    if( (GetMap( x+1, y+1 ) < 9) && !((parent_x == x+1) && (parent_y == y+1)) )
+    {
+        NewNode = MapSearchNode( x+1, y+1 );
+        astarsearch->AddSuccessor( NewNode );
+    }
+    if( (GetMap( x-1, y+1 ) < 9) && !((parent_x == x-1) && (parent_y == y+1)) )
+    {
+        NewNode = MapSearchNode( x-1, y+1 );
+        astarsearch->AddSuccessor( NewNode );
+    }
+
     return true;
 }
 
@@ -126,7 +148,12 @@ bool MapSearchNode::GetSuccessors(
 // the answer is the map terrain value at this node since that is conceptually where we're moving
 float MapSearchNode::GetCost( MapSearchNode &successor )
 {
-    return (float) GetMap( x, y );
+    //Tarda demasiado
+    //float distancia = (successor.x - x)*(successor.x - x) + (successor.y - y)*(successor.y - y);
+    float distancia = GetMap( x, y );//1;
+    if(successor.x != x && successor.y != y) distancia+=0.5f;
+    //return (float) GetMap( x, y ) + distancia;
+    return distancia;
 }
 
 //__________________________________________________________________________________________________

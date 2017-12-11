@@ -120,7 +120,7 @@ public: // methods
 		m_State( SEARCH_STATE_NOT_INITIALISED ),
 		m_CurrentSolutionNode( NULL ),
 #if USE_FSA_MEMORY
-		m_FixedSizeAllocator( 3000 ), //La aumento para encontrar caminos largos
+		m_FixedSizeAllocator( 6000 ), //La aumento para encontrar caminos largos
 #endif
 		m_AllocateNodeCount(0),
 		m_CancelRequest( false )

@@ -108,7 +108,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		/// PTO INICIO
 		if(ptoIni != null) {
 			sourceToViewCoord(ptoIni!!, ptoView)
-			Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
+			//Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
 			val vX = ptoView.x - imgIni!!.width / 2
 			val vY = ptoView.y - imgIni!!.height
 			canvas.drawBitmap(imgIni!!, vX, vY, paint)
@@ -117,7 +117,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		/// PTO DESTINO
 		if(ptoEnd != null) {
 			sourceToViewCoord(ptoEnd!!, ptoView)
-			Log.e(TAG, "onDraw:end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
+			//Log.e(TAG, "onDraw:end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
 			val vX = ptoView.x - imgEnd!!.width / 2
 			val vY = ptoView.y - imgEnd!!.height
 			canvas.drawBitmap(imgEnd!!, vX, vY, paint)
@@ -129,7 +129,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			path.reset()
 			sourceToViewCoord(camino!![0].x, camino!![0].y, preView)
 			path.moveTo(preView.x, preView.y)
-			Log.e(TAG, "onDraw:camino:-----------------------src:"+camino!![0]+" : view:"+preView)
+			//Log.e(TAG, "onDraw:camino:-----------------------src:"+camino!![0]+" : view:"+preView)
 			for(i in 1 until camino!!.size) {
 				sourceToViewCoord(camino!![i].x, camino!![i].y, ptoView)
 				//Log.e(TAG, "camino:-----------------------src:"+camino!![i]+" : view:"+ptoView)

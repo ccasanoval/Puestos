@@ -14,6 +14,11 @@ import com.cesoft.puestos.util.Plane
 import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.ui.CesImgView
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import org.reactivestreams.Subscriber
 
 /**
  * Created by ccasanova on 29/11/2017
@@ -71,10 +76,32 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		else {
 			end100.set(pto100)
 			end.value = pto
-			val sol = plane.calc(ini100, end100)
-			camino.value = sol.data
-			if(sol.data == null)
-				mensaje.value = getApplication<App>().getString(R.string.error_camino)
+			/// En otro hilo
+
+			val s = Single.create<Plane.Solucion> { emitter ->
+				val sol = plane.calc(ini100, end100)
+				emitter.onSuccess(sol)
+			}
+			s.subscribeOn(Schedulers.newThread())
+			s.observeOn(AndroidSchedulers.mainThread())
+			s.subscribe({it ->
+				camino.value = it.data
+				if(it.data == null)
+					mensaje.value = getApplication<App>().getString(R.string.error_camino)
+			})
+
+/*
+			Observable.create<Array<PointF>> {
+				val sol = plane.calc(ini100, end100)
+				camino.value = sol.data
+				if(sol.data == null)
+					mensaje.value = getApplication<App>().getString(R.string.error_camino)
+
+			}
+				.subscribeOn(Schedulers.newThread())
+				//.observeOn(AndroidSchedulers.mainThread())
+				.subscribe()*/
+
 		}
 	}
 
