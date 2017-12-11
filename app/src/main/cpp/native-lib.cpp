@@ -150,9 +150,9 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 {
     //Tarda demasiado
     //float distancia = (successor.x - x)*(successor.x - x) + (successor.y - y)*(successor.y - y);
+    //return (float) GetMap( x, y ) + distancia;
     float distancia = GetMap( x, y );//1;
     if(successor.x != x && successor.y != y) distancia+=0.5f;
-    //return (float) GetMap( x, y ) + distancia;
     return distancia;
 }
 

@@ -55,7 +55,7 @@ class Plane(context: Context) {
 	//______________________________________________________________________________________________
 	private val isValid: Boolean
 	get() {
-		Log.e(TAG, "isValid:------------0---"+(cols*rows)+"-------------"+data.size)
+		Log.e(TAG, "isValid:---------------"+(cols*rows)+" === "+data.size)
 		if(!isReady || data.size < 4 || data.size != cols*rows)
 			return false
 		return true
@@ -74,10 +74,10 @@ class Plane(context: Context) {
 		return PointF(x, y)
 	}
 	//______________________________________________________________________________________________
-	fun calc(ini: PointF, end: PointF): Solucion {
+	fun calc(ini: PointF, end: PointF): Solution {
 		Log.e(TAG, "calc0:------------0----------------"+data.size)
 
-		val err = Solucion(false, null)
+		val err = Solution(false, null)
 		if(!isValid) return err
 
 		val iniMap = coordIn(ini)
@@ -92,8 +92,9 @@ class Plane(context: Context) {
 
 		Log.e(TAG, "CALC: ------------"+iniMap+" === "+data[iniMap.y.toInt()*cols+iniMap.x.toInt()]+" / "+endMap +" === "+data[endMap.y.toInt()*cols+endMap.x.toInt()])
 		val res = Astar().calcMapa(iniMap, endMap, data.toByteArray(), cols, rows)
-		Log.e(TAG, res)/////*************************************
-
+		//val sol = translateRes(res)
+		//if( ! sol.isOk)
+		//Log.e(TAG, res)/////*************************************
 		return translateRes(res)
 	}
 	//______________________________________________________________________________________________
@@ -102,25 +103,46 @@ class Plane(context: Context) {
 		ptoOut.set(ptoIn)
 		val nueve: Byte = 9
 		if(data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()] == nueve) {
-			if(ptoOut.x-1 >= 0 && data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()-1] != nueve)
-				ptoOut.x -= 1
-			else if(ptoOut.x+1 < cols && data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()+1] != nueve)
-				ptoOut.x += 1
-			else if(ptoOut.y-1 >= 0 && data[(ptoOut.y.toInt()-1)*cols+ptoOut.x.toInt()] != nueve)
-				ptoOut.y -= 1
-			else if(ptoOut.y+1 < rows && data[(ptoOut.y.toInt()+1)*cols+ptoOut.x.toInt()] != nueve)
-				ptoOut.y += 1
-			else
+			for(x in 1..50) {
+				for(y in 0..x) {
+					if(ptoOut.x -x >= 0 && ptoOut.y -y >= 0
+							&& data[(ptoOut.y.toInt() -y) * cols + ptoOut.x.toInt() -x] != nueve) {
+						ptoOut.x -= x
+						ptoOut.y -= y
+						break
+					}
+					if(ptoOut.x +x < cols && ptoOut.y +y < rows
+							&& data[(ptoOut.y.toInt() +y) * cols + ptoOut.x.toInt() +x] != nueve) {
+						ptoOut.x += x
+						ptoOut.y += y
+						break
+					}
+					if(ptoOut.x -x >= 0 && ptoOut.y +y < rows
+							&& data[(ptoOut.y.toInt() +y) * cols + ptoOut.x.toInt() -x] != nueve) {
+						ptoOut.x -= x
+						ptoOut.y += y
+						break
+					}
+					if(ptoOut.x +x < cols && ptoOut.y -y >= 0
+							&& data[(ptoOut.y.toInt() -y) * cols + ptoOut.x.toInt() +x] != nueve) {
+						ptoOut.x += x
+						ptoOut.y -= y
+						break
+					}
+				}
+				if(data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()] != nueve)break
+			}
+			if(data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()] == nueve)
 				Log.e(TAG, "Error: diste con pared ................Avisar a usuario......................."+ptoIn)
 		}
 		return ptoOut
 	}
 
 	//______________________________________________________________________________________________
-	private fun translateRes(res: String): Solucion {
+	private fun translateRes(res: String): Solution {
 		//TODO: devolver struct ??
 		val gson = Gson()
-		val sol = gson.fromJson(res, Solucion::class.java)
+		val sol = gson.fromJson(res, Solution::class.java)
 		sol.isOk = sol.resultado == "ok"
 		if(sol.isOk && sol.camino != null) {
 			sol.data = Array(sol.pasos+1, { coordOut(Point(sol.camino!![it][0], sol.camino!![it][1])) })
@@ -128,7 +150,7 @@ class Plane(context: Context) {
 		}
 		else {
 			Log.e(TAG, "err--------------------------------------"+sol.resultado+":\n"+res)
-			return Solucion(false, null)
+			return sol
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +164,7 @@ class Plane(context: Context) {
 			 , [ "61", "34" ]
 			  ], "pasos":"56", "pasosBusqueda": "187" } }
         */
-	data class Solucion(
+	data class Solution(
 		@Transient var isOk: Boolean,
 		@Transient var data: Array<PointF>? = null)
 	{

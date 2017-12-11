@@ -4,6 +4,7 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.PointF
+import android.support.annotation.MainThread
 import com.cesoft.puestos.App
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
@@ -19,6 +20,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.reactivestreams.Subscriber
+import java.util.concurrent.Callable
 
 /**
  * Created by ccasanova on 29/11/2017
@@ -76,32 +78,21 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		else {
 			end100.set(pto100)
 			end.value = pto
+
 			/// En otro hilo
 
-			val s = Single.create<Plane.Solucion> { emitter ->
-				val sol = plane.calc(ini100, end100)
-				emitter.onSuccess(sol)
-			}
-			s.subscribeOn(Schedulers.newThread())
-			s.observeOn(AndroidSchedulers.mainThread())
-			s.subscribe({it ->
-				camino.value = it.data
-				if(it.data == null)
-					mensaje.value = getApplication<App>().getString(R.string.error_camino)
+			Observable.defer({
+				Observable.just(plane.calc(ini100, end100))
 			})
-
-/*
-			Observable.create<Array<PointF>> {
-				val sol = plane.calc(ini100, end100)
-				camino.value = sol.data
-				if(sol.data == null)
+			.subscribeOn(Schedulers.newThread())
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe({it ->
+				camino.value = it.data
+				if(it.data == null) {
 					mensaje.value = getApplication<App>().getString(R.string.error_camino)
-
-			}
-				.subscribeOn(Schedulers.newThread())
-				//.observeOn(AndroidSchedulers.mainThread())
-				.subscribe()*/
-
+				}
+				Log.e(TAG, "punto:calc-ruta: ok="+it.isOk+", pasosBusqueda="+it.pasosBusqueda+", pasos="+it.pasos)
+			})
 		}
 	}
 
