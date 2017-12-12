@@ -5,12 +5,14 @@ import android.arch.lifecycle.ViewModelProviders
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
 import android.os.Bundle
+import android.support.annotation.IdRes
 import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.CesImgView
+import com.cesoft.puestos.ui.ViewField.bind
 import com.cesoft.puestos.ui.dlg.Dlg
 import com.davemorrissey.labs.subscaleview.ImageSource
 
@@ -22,8 +24,9 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 class MapaActivity : BaseActivity() {
 
 	private lateinit var viewModel : MapaViewModel
-	private lateinit var imgPlano: CesImgView
-	//private var isReadyMapa = false
+	private val imgPlano: CesImgView by bind(R.id.imgPlano)
+	private var imgListener: View.OnTouchListener ?=null
+
 
 	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +36,7 @@ class MapaActivity : BaseActivity() {
 		val toolbar: Toolbar = findViewById(R.id.toolbar)
 		setSupportActionBar(toolbar)
 
-		imgPlano = findViewById(R.id.imgPlano)
+		//imgPlano = findViewById(R.id.imgPlano)//https://medium.com/@quiro91/improving-findviewbyid-with-kotlin-4cf2f8f779bb
 		imgPlano.setImage(ImageSource.resource(R.drawable.plano))
 		//imgPlano.setImage(ImageSource.asset("map.png"))
 		//imgPlano.setImage(ImageSource.uri("/sdcard/DCIM/DSCM00123.JPG"));
@@ -43,34 +46,44 @@ class MapaActivity : BaseActivity() {
 		//imgPlano.setOnTouchListener { _, motionEvent -> getGestureDetector().onTouchEvent(motionEvent) }
 
 		val gesture = getGestureDetector()//Si no uso esta variable, deja de funcionar bien ¿?¿?
-		imgPlano.setOnTouchListener { _, motionEvent -> gesture.onTouchEvent(motionEvent) }
+		imgListener = View.OnTouchListener { _, motionEvent ->
+			gesture.onTouchEvent(motionEvent)
+		}
+		imgPlano.setOnTouchListener(imgListener)
+		//setMinimumDpi
 
 		registerForContextMenu(imgPlano)
 
 		///////////// ViewModel Observers
 		//
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
-		viewModel.mensaje.observe(this, Observer {
-			mensaje -> Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
+		viewModel.mensaje.observe(this, Observer { mensaje ->
+			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})
-		viewModel.usuario.observe(this, Observer<String> {
-			usuario -> setTituloFromEmail(usuario)
+		viewModel.usuario.observe(this, Observer<String> { usuario ->
+			setTituloFromEmail(usuario)
 		})
-		viewModel.camino.observe(this, Observer<Array<PointF>> {
-			camino ->
-			if(camino == null)
-				delCamino()
-			else
-				drawCamino(camino)
+		viewModel.camino.observe(this, Observer<Array<PointF>> { camino ->
+			if(camino == null)	delCamino()
+			else				drawCamino(camino)
 		})
-		viewModel.ini.observe(this, Observer<PointF>{
-			pto -> drawIni(pto)
-		})
-		viewModel.end.observe(this, Observer<PointF>{
-			pto -> drawEnd(pto)
-		})
+		viewModel.ini.observe(this, Observer<PointF>{ pto -> drawIni(pto) })
+		viewModel.end.observe(this, Observer<PointF>{ pto -> drawEnd(pto) })
 		////////////
+		Log.e(TAG, "onCreate:-----------------------------------------------------------------")
 	}
+	//______________________________________________________________________________________________
+	override fun onDestroy() {
+		Log.e(TAG, "onDestroy:-----------------------------------------------------------------")
+		super.onDestroy()
+		imgPlano.destroyDrawingCache()
+		imgPlano.recycle()
+
+		System.gc()
+
+		//imgPlano.setImage(null)
+	}
+
 
 	//______________________________________________________________________________________________
 	private fun setTituloFromEmail(titulo: String?) {

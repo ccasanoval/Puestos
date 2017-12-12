@@ -46,8 +46,17 @@ dependencies {
     //implementation 'com.android.support:support-v13:26.1.0'
     //
 
+    // Image View
     // SubsamplingScaleImageView: ImageView with zoom : usa 26.1.0
     implementation "com.davemorrissey.labs:subsampling-scale-image-view:3.8.0"
+    //
+    //compile 'com.github.piasy:BigImageViewer:1.4.5'
+    // load with fresco
+    //compile 'com.github.piasy:FrescoImageLoader:1.4.5'
+    // load with glide
+    //compile 'com.github.piasy:GlideImageLoader:1.4.5'
+    // progress pie indicator
+    //compile 'com.github.piasy:ProgressPieIndicator:1.4.5'
 
     // Architecture Components
     implementation "android.arch.lifecycle:extensions:1.0.0"
@@ -60,10 +69,14 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.1'
 
     /// Rx
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
-    compile 'io.reactivex.rxjava2:rxjava:2.1.7'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
+
+    /// Leak Canary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 }
 
 // Firebase

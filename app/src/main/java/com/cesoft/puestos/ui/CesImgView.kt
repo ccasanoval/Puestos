@@ -39,7 +39,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		val density = resources.displayMetrics.densityDpi.toFloat()
 		imgIni = BitmapFactory.decodeResource(this.resources, drawable.ini)
 		imgEnd = BitmapFactory.decodeResource(this.resources, drawable.end)
-//Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
+Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		val w = density / 420f * imgIni!!.width
 		val h = density / 420f * imgIni!!.height
 		imgIni = Bitmap.createScaledBitmap(imgIni!!, w.toInt(), h.toInt(), true)

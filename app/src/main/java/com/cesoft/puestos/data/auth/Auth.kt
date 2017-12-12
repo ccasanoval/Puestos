@@ -19,12 +19,15 @@ class Auth private constructor() {
 	fun getEmail(): String? = auth.currentUser?.email
 
 	//______________________________________________________________________________________________
-	fun addAuthStateListener(listener: ()->Unit) {
-		auth.addAuthStateListener({ _ ->
-			listener()
-		})
+	fun addAuthStateListener(listener: FirebaseAuth.AuthStateListener) {//(listener: ()->Unit) {
+		auth.addAuthStateListener(listener)
+	}
+	//______________________________________________________________________________________________
+	fun delAuthStateListener(listener: FirebaseAuth.AuthStateListener) {
+		auth.removeAuthStateListener(listener)
 	}
 
+	//______________________________________________________________________________________________
 	fun login(email: String, clave: String, callback: (Auth, Exception?)->Unit) { //TODO: listener: com.google.android.gms.tasks.OnCompleteListener<Auth>) {
 		auth.signInWithEmailAndPassword(email, clave)
 			.addOnCompleteListener { auth2 ->

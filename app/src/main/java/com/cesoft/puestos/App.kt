@@ -2,10 +2,12 @@ package com.cesoft.puestos
 
 import android.app.Application
 import com.cesoft.puestos.data.auth.Auth
+import com.squareup.leakcanary.LeakCanary
 
 
 //ZOOM ImageView:
 //https://blog.fossasia.org/implementing-a-zoomable-imageview-by-extending-the-default-viewpager-in-phimpme-android/
+//https://github.com/Piasy/BigImageViewer
 
 //Arch Comp
 //https://developer.android.com/topic/libraries/architecture/adding-components.html
@@ -28,6 +30,7 @@ import com.cesoft.puestos.data.auth.Auth
 //						Permite reservar puestos de trabajo
 //TODO: showWorkstations, showFreeWorkstations(day), ...
 
+
 /**
  * Created by ccasanova on 30/11/2017
  */
@@ -37,6 +40,20 @@ class App : Application() {
 
 	override fun onCreate() {
 		super.onCreate()
+
+		/// LEAK CANARY
+		if (LeakCanary.isInAnalyzerProcess(this)) {
+			// This process is dedicated to LeakCanary for heap analysis.
+			// You should not init your app in this process.
+			return
+		}
+		LeakCanary.install(this)
+
+		/// IMG VIEW
+		//BigImageViewer.initialize(FrescoImageLoader.with(appContext));
+		//BigImageViewer.initialize(GlideImageLoader.with(this))
+
+		/// FIRE AUTH
 		auth = Auth.getInstance(this)
 	}
 }
