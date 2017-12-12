@@ -15,6 +15,7 @@ import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.App
 import com.cesoft.puestos.data.auth.Auth
+import com.cesoft.puestos.ui.ViewField.enlaza
 import com.cesoft.puestos.ui.mapa.MapaActivity
 
 //TODO: MVVM
@@ -24,21 +25,20 @@ import com.cesoft.puestos.ui.mapa.MapaActivity
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
-	private var txtStatus: TextView? = null
-	private var txtEmail: EditText? = null
-	private var txtClave: EditText? = null
+	private val txtStatus: TextView by enlaza(R.id.txtLoginStatus)
+	private val txtEmail: EditText by enlaza(R.id.txtLoginEmail)
+	private val txtClave: EditText by enlaza(R.id.txtLoginClave)
 
 	private lateinit var auth: Auth
-
 
 	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.act_login)
 
-		txtStatus = findViewById(R.id.txtLoginStatus)
-		txtEmail = findViewById(R.id.txtLoginEmail)
-		txtClave = findViewById(R.id.txtLoginClave)
+//		txtStatus = findViewById(R.id.txtLoginStatus)
+//		txtEmail = findViewById(R.id.txtLoginEmail)
+//		txtClave = findViewById(R.id.txtLoginClave)
 
 		val btnLogin: Button = findViewById(R.id.btnLogin)
 		btnLogin.setOnClickListener(this)
@@ -75,7 +75,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 				Log.e(TAG, "signInWithEmail:failure-------------------------", exception)
 					Toast.makeText(this@LoginActivity, R.string.error_login, Toast.LENGTH_SHORT).show()
 					updateUI(null)
-					txtStatus!!.setText(R.string.error_login)
+					txtStatus.setText(R.string.error_login)
 			}
 		})
 	}
@@ -89,22 +89,22 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 	//______________________________________________________________________________________________
 	private fun validateForm(): Boolean {
 		var valid = true
-		val email = txtEmail!!.text.toString()
+		val email = txtEmail.text.toString()
 		if(TextUtils.isEmpty(email)) {
-			txtEmail!!.error = getString(R.string.campo_obligatorio)
+			txtEmail.error = getString(R.string.campo_obligatorio)
 			valid = false
 		}
 		else {
-			txtEmail!!.error = null
+			txtEmail.error = null
 		}
 
-		val password = txtClave!!.text.toString()
+		val password = txtClave.text.toString()
 		if(TextUtils.isEmpty(password)) {
-			txtClave!!.error = getString(R.string.campo_obligatorio)
+			txtClave.error = getString(R.string.campo_obligatorio)
 			valid = false
 		}
 		else {
-			txtClave!!.error = null
+			txtClave.error = null
 		}
 
 		return valid
@@ -114,7 +114,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 	private fun updateUI(userEmail: String?, isVerifiedEmail: Boolean? = false) {
 		hideProgressDialog()
 		if(userEmail != null) {
-			txtStatus!!.text = getString(R.string.ok_login, userEmail, isVerifiedEmail)
+			txtStatus.text = getString(R.string.ok_login, userEmail, isVerifiedEmail)
 
 			var view: View = findViewById(R.id.layLoginBotones)
 			view.visibility=(View.GONE)
@@ -126,7 +126,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 			finish()
 		}
 		else {
-			txtStatus!!.setText(R.string.sesion_cerrada)
+			txtStatus.setText(R.string.sesion_cerrada)
 
 			var view: View = findViewById(R.id.layLoginBotones)
 			view.visibility=(View.VISIBLE)
@@ -141,7 +141,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 	override fun onClick(v: View) {
 		val i = v.id
 		if(i == R.id.btnLogin) {
-			signIn(txtEmail!!.text.toString(), txtClave!!.text.toString())
+			signIn(txtEmail.text.toString(), txtClave.text.toString())
 		}
 		else if(i == R.id.btnLogout) {
 			signOut()

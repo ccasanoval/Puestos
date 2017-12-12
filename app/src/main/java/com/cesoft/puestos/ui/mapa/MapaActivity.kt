@@ -5,14 +5,13 @@ import android.arch.lifecycle.ViewModelProviders
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
 import android.os.Bundle
-import android.support.annotation.IdRes
 import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.CesImgView
-import com.cesoft.puestos.ui.ViewField.bind
+import com.cesoft.puestos.ui.ViewField.enlaza
 import com.cesoft.puestos.ui.dlg.Dlg
 import com.davemorrissey.labs.subscaleview.ImageSource
 
@@ -24,7 +23,7 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 class MapaActivity : BaseActivity() {
 
 	private lateinit var viewModel : MapaViewModel
-	private val imgPlano: CesImgView by bind(R.id.imgPlano)
+	private val imgPlano: CesImgView by enlaza(R.id.imgPlano)
 	private var imgListener: View.OnTouchListener ?=null
 
 
@@ -78,12 +77,8 @@ class MapaActivity : BaseActivity() {
 		super.onDestroy()
 		imgPlano.destroyDrawingCache()
 		imgPlano.recycle()
-
-		System.gc()
-
-		//imgPlano.setImage(null)
+		//System.gc()
 	}
-
 
 	//______________________________________________________________________________________________
 	private fun setTituloFromEmail(titulo: String?) {
@@ -104,6 +99,7 @@ class MapaActivity : BaseActivity() {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when(item.itemId) {
 			R.id.action_logout -> {
+				Log.e(TAG, "onOptionsItemSelected:action_logout:----------------------------------------------")
 				Dlg.showSiNo(this,
 						getString(R.string.seguro_logout),
 						{ si -> if(si) viewModel.logout() })

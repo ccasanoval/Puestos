@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/blanco"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.cesoft.puestos.ui.mapa.MapaActivity">
 
     <android.support.v7.widget.Toolbar
@@ -13,14 +15,14 @@
         android:background="@color/colorPrimaryDark"
         android:theme="@style/ThemeOverlay.AppCompat.Dark"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-        <!-- com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView -->
-        <com.cesoft.puestos.ui.CesImgView
-            android:id="@+id/imgPlano"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </LinearLayout>
+    <com.cesoft.puestos.ui.CesImgView
+        android:id="@+id/imgPlano"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
 </android.support.constraint.ConstraintLayout>
