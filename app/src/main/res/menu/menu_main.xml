@@ -2,7 +2,38 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_logout"
+        android:id="@+id/act_ruta"
+        android:icon="@android:drawable/ic_menu_directions"
+        android:title="@string/ruta"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/act_info"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/info"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/act_lista"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="@string/puestos"
+        app:showAsAction="ifRoom"/>
+
+    <!-- ADMIN -->
+    <!-- item
+        android:id="@+id/act_puesto_new"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/puesto_new"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/act_puesto_del"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/puesto_del"
+        app:showAsAction="ifRoom"/>
+    < ADMIN -->
+
+    <item
+        android:id="@+id/act_logout"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="@string/logout"
         app:showAsAction="ifRoom"/>

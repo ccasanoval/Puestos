@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import com.cesoft.puestos.Log
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.cesoft.puestos.R.drawable
+import com.cesoft.puestos.models.Workstation
 
 
 /**
@@ -29,6 +30,10 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var caminoOrg: Array<PointF>? = null
 	private var camino: Array<PointF>? = null
 
+	private var puestos: List<Workstation>? = null
+	private var imgLibre: Bitmap? = null
+	private var imgOcupado: Bitmap? = null
+
 
 	//______________________________________________________________________________________________
 	init {
@@ -37,14 +42,25 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private fun initialise() {
 		//val a = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
 		val density = resources.displayMetrics.densityDpi.toFloat()
+
+		/// Desde Hasta
 		imgIni = BitmapFactory.decodeResource(this.resources, drawable.ini)
 		imgEnd = BitmapFactory.decodeResource(this.resources, drawable.end)
 Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
-		val w = density / 420f * imgIni!!.width
-		val h = density / 420f * imgIni!!.height
+		var w = density / 420f * imgIni!!.width
+		var h = density / 420f * imgIni!!.height
 		imgIni = Bitmap.createScaledBitmap(imgIni!!, w.toInt(), h.toInt(), true)
 		imgEnd = Bitmap.createScaledBitmap(imgEnd!!, w.toInt(), h.toInt(), true)
 
+		/// Libre Ocupado
+		imgLibre = BitmapFactory.decodeResource(this.resources, drawable.libre)
+		imgOcupado = BitmapFactory.decodeResource(this.resources, drawable.ocupado)
+		w = density / 420f * imgLibre!!.width
+		h = density / 420f * imgLibre!!.height
+		imgLibre = Bitmap.createScaledBitmap(imgLibre!!, w.toInt(), h.toInt(), true)
+		imgOcupado = Bitmap.createScaledBitmap(imgOcupado!!, w.toInt(), h.toInt(), true)
+
+		/// Camino
 		strokeWidth = (density / 60f).toInt()
 	}
 	//______________________________________________________________________________________________
@@ -55,14 +71,12 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 
 	//______________________________________________________________________________________________
 	fun setIni(pto: PointF?) {
-		this.ptoIni = pto
-		//initialise()
+		ptoIni = pto
 		invalidate()
 	}
 	//______________________________________________________________________________________________
 	fun setEnd(pto: PointF?) {
-		this.ptoEnd = pto
-		//initialise()
+		ptoEnd = pto
 		invalidate()
 	}
 	//______________________________________________________________________________________________
@@ -71,13 +85,22 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		if(!isReady || valor == null || valor.size < 2)return
 		camino = Array(valor.size, {coord100ToImg(valor[it])})
 		Log.e(TAG, "setCamino:--------------------a-----"+valor.size+"----"+valor[0]+" : "+camino!![0])
-		//initialise()
 		invalidate()
 	}
 	//______________________________________________________________________________________________
 	fun delCamino() {
 		camino = Array(0, { PointF(0f,0f) })
 		caminoOrg = camino
+		invalidate()
+	}
+	//______________________________________________________________________________________________
+	fun setPuestos(puestos: List<Workstation>) {
+		this.puestos = puestos
+		for(puesto in puestos) {
+			val coord: PointF = coord100ToImg(PointF(puesto.x, puesto.y))
+			puesto.x = coord.x
+			puesto.y = coord.y
+		}
 		invalidate()
 	}
 
@@ -106,24 +129,36 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		paint.isAntiAlias = true
 
 		/// PTO INICIO
+		drawIni(canvas)
+		/// PTO DESTINO
+		drawEnd(canvas)
+		/// CAMINO
+		drawCamino(canvas)
+		/// PUESTOS
+		drawPuestos(canvas)
+	}
+	//______________________________________________________________________________________________
+	private fun drawIni(canvas: Canvas) {
 		if(ptoIni != null) {
 			sourceToViewCoord(ptoIni!!, ptoView)
 			//Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
-			val vX = ptoView.x - imgIni!!.width / 2
-			val vY = ptoView.y - imgIni!!.height
-			canvas.drawBitmap(imgIni!!, vX, vY, paint)
+			val x = ptoView.x - imgIni!!.width / 2
+			val y = ptoView.y - imgIni!!.height
+			canvas.drawBitmap(imgIni!!, ptoIni!!.x, ptoIni!!.y, paint)
 		}
-
-		/// PTO DESTINO
+	}
+	//______________________________________________________________________________________________
+	private fun drawEnd(canvas: Canvas) {
 		if(ptoEnd != null) {
 			sourceToViewCoord(ptoEnd!!, ptoView)
 			//Log.e(TAG, "onDraw:end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
-			val vX = ptoView.x - imgEnd!!.width / 2
-			val vY = ptoView.y - imgEnd!!.height
-			canvas.drawBitmap(imgEnd!!, vX, vY, paint)
+			val x = ptoView.x - imgEnd!!.width / 2
+			val y = ptoView.y - imgEnd!!.height
+			canvas.drawBitmap(imgEnd!!, x, y, paint)
 		}
-
-		/// CAMINO
+	}
+	//______________________________________________________________________________________________
+	private fun drawCamino(canvas: Canvas) {
 		path.reset()
 		if(camino != null && camino!!.size >= 2) {
 			path.reset()
@@ -144,6 +179,18 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 			paint.strokeWidth = strokeWidth.toFloat()
 			paint.color = Color.argb(255, 38, 166, 154)
 			canvas.drawPath(path, paint)
+		}
+	}
+	//______________________________________________________________________________________________
+	private fun drawPuestos(canvas: Canvas) {
+		if(puestos != null) {
+			for(puesto in puestos!!) {
+				sourceToViewCoord(PointF(puesto.x, puesto.y), ptoView)
+				val x = ptoView.x - imgLibre!!.width / 2
+				val y = ptoView.y - imgLibre!!.height /2
+				//TODO: esta libre u ocupado ????
+				canvas.drawBitmap(imgLibre!!, x, y, paint)
+			}
 		}
 	}
 

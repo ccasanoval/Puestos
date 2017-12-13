@@ -16,8 +16,7 @@ import com.cesoft.puestos.Log
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class Plane(context: Context) {
-	var isReady: Boolean = false
-		private set
+	private var isReady: Boolean = false
 	private val data:  MutableList<Byte> = mutableListOf()
 	private var cols = 0
 	private var rows = 0
@@ -74,7 +73,7 @@ class Plane(context: Context) {
 		return PointF(x, y)
 	}
 	//______________________________________________________________________________________________
-	fun calc(ini: PointF, end: PointF): Solution {
+	fun calcRuta(ini: PointF, end: PointF): Solution {
 		Log.e(TAG, "calc0:------------0----------------"+data.size)
 
 		val err = Solution(false, null)
@@ -103,7 +102,7 @@ class Plane(context: Context) {
 		ptoOut.set(ptoIn)
 		val nueve: Byte = 9
 		if(data[ptoOut.y.toInt()*cols+ptoOut.x.toInt()] == nueve) {
-			for(x in 1..50) {
+			for(x in 1..150) {
 				for(y in 0..x) {
 					if(ptoOut.x -x >= 0 && ptoOut.y -y >= 0
 							&& data[(ptoOut.y.toInt() -y) * cols + ptoOut.x.toInt() -x] != nueve) {

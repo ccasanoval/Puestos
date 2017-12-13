@@ -17,5 +17,15 @@
     <string name="acciones">Acciones:</string>
     <string name="error_camino">No se puede calcular el camino</string>
     <string name="error_outside_bounds">El punto elegido está fuera del plano</string>
+    <string name="ruta">Calcular ruta</string>
+    <string name="info">Info de puestos</string>
+    <string name="puestos">Lista de puestos</string>
+    <string name="puesto_new">Nuevo puesto</string>
+    <string name="puesto_del">Borrar puesto</string>
+    <string name="ruta_msg">Seleccione comienzo y fin de ruta</string>
+    <string name="info_msg">Seleccione el puesto</string>
+    <string name="puestos_msg">Lista de puestos</string>
+    <string name="puestos_get_error">Error al obtener los puestos</string>
+    <string name="puestos_get_none">No se encontraron puestos</string>
 
 </resources>

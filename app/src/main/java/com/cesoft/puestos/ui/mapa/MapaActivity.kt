@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.Log
 import com.cesoft.puestos.R
+import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.CesImgView
 import com.cesoft.puestos.ui.ViewField.enlaza
@@ -36,8 +37,8 @@ class MapaActivity : BaseActivity() {
 		setSupportActionBar(toolbar)
 
 		//imgPlano = findViewById(R.id.imgPlano)//https://medium.com/@quiro91/improving-findviewbyid-with-kotlin-4cf2f8f779bb
-		imgPlano.setImage(ImageSource.resource(R.drawable.plano))
-		//imgPlano.setImage(ImageSource.asset("map.png"))
+		//imgPlano.setImage(ImageSource.resource(R.drawable.plano))
+		imgPlano.setImage(ImageSource.asset("plano.jpg"))
 		//imgPlano.setImage(ImageSource.uri("/sdcard/DCIM/DSCM00123.JPG"));
 
 		//imgPlano.setDoubleTapZoomDuration(200)
@@ -50,9 +51,20 @@ class MapaActivity : BaseActivity() {
 		}
 		imgPlano.setOnTouchListener(imgListener)
 		//setMinimumDpi
+		//registerForContextMenu(imgPlano)
 
-		registerForContextMenu(imgPlano)
+		iniViewModel()
+	}
+	//______________________________________________________________________________________________
+	override fun onDestroy() {
+		super.onDestroy()
+		imgPlano.destroyDrawingCache()
+		imgPlano.recycle()
+		//System.gc()
+	}
 
+	//______________________________________________________________________________________________
+	private fun iniViewModel() {
 		///////////// ViewModel Observers
 		//
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
@@ -64,20 +76,20 @@ class MapaActivity : BaseActivity() {
 		})
 		viewModel.camino.observe(this, Observer<Array<PointF>> { camino ->
 			if(camino == null)	delCamino()
-			else				drawCamino(camino)
+			else				showCamino(camino)
+		})
+		viewModel.puestos.observe(this, Observer<List<Workstation>> { puestos ->
+			when {
+				puestos == null ->
+					Toast.makeText(this@MapaActivity, getString(R.string.puestos_get_error), Toast.LENGTH_SHORT).show()
+				puestos.isEmpty() ->
+					Toast.makeText(this@MapaActivity, getString(R.string.puestos_get_none), Toast.LENGTH_SHORT).show()
+				else ->
+					showPuestos(puestos)
+			}
 		})
 		viewModel.ini.observe(this, Observer<PointF>{ pto -> drawIni(pto) })
 		viewModel.end.observe(this, Observer<PointF>{ pto -> drawEnd(pto) })
-		////////////
-		Log.e(TAG, "onCreate:-----------------------------------------------------------------")
-	}
-	//______________________________________________________________________________________________
-	override fun onDestroy() {
-		Log.e(TAG, "onDestroy:-----------------------------------------------------------------")
-		super.onDestroy()
-		imgPlano.destroyDrawingCache()
-		imgPlano.recycle()
-		//System.gc()
 	}
 
 	//______________________________________________________________________________________________
@@ -98,37 +110,26 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when(item.itemId) {
-			R.id.action_logout -> {
+			R.id.act_ruta -> {
+				viewModel.modo = MapaViewModel.Modo.Ruta
+				Toast.makeText(this@MapaActivity, getString(R.string.ruta_msg), Toast.LENGTH_SHORT).show()
+			}
+			R.id.act_info -> {
+				viewModel.modo = MapaViewModel.Modo.Info
+				Toast.makeText(this@MapaActivity, getString(R.string.info_msg), Toast.LENGTH_SHORT).show()
+			}
+			R.id.act_lista -> {
+				viewModel.modo = MapaViewModel.Modo.Puestos
+				Toast.makeText(this@MapaActivity, getString(R.string.puestos_msg), Toast.LENGTH_SHORT).show()
+			}
+			R.id.act_logout -> {
 				Log.e(TAG, "onOptionsItemSelected:action_logout:----------------------------------------------")
 				Dlg.showSiNo(this,
 						getString(R.string.seguro_logout),
 						{ si -> if(si) viewModel.logout() })
-				return true
 			}
 			else ->
 				return super.onOptionsItemSelected(item)
-		}
-	}
-	//// MENU CONTEXT
-	//______________________________________________________________________________________________
-	override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo)
-	{
-		super.onCreateContextMenu(menu, v, menuInfo)
-		Log.e(TAG, "onCreateContextMenu----------------------------------------------------------------")
-		menu.setHeaderTitle(getString(R.string.acciones))
-		menu.add(0, v.id, 0, getString(R.string.desde_aqui))//groupId, itemId, order, title
-		menu.add(0, v.id, 0, getString(R.string.hasta_aqui))
-	}
-	//______________________________________________________________________________________________
-	override fun onContextItemSelected(item: MenuItem): Boolean {
-		when {
-			item.title == getString(R.string.desde_aqui) -> {
-				Toast.makeText(applicationContext, "aaaaaaaaaaa", Toast.LENGTH_LONG).show()
-			}
-			item.title == getString(R.string.hasta_aqui) -> {
-				Toast.makeText(applicationContext, "bbbbbbbbbbb", Toast.LENGTH_LONG).show()
-			}
-			else -> return false
 		}
 		return true
 	}
@@ -154,13 +155,13 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	private fun getGestureDetector() =
 		GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-//			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-//				if(imgPlano.isReady)
-//					singleTapConfirmed(e)
-//				else
-//					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-//				return false
-//			}
+			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+				if(imgPlano.isReady)
+					singleTapConfirmed(e)
+				else
+					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
+				return false
+			}
 
 			override fun onLongPress(e: MotionEvent) {
 				if(imgPlano.isReady)
@@ -182,27 +183,29 @@ class MapaActivity : BaseActivity() {
 
 
 	//______________________________________________________________________________________________
-	/*private fun doubleTap(me: MotionEvent) {
-		//val sCoord = imgPlano.viewToSourceCoord(me.x, me.y)
-		//Toast.makeText(this@MapaActivity, "Double tap: " + sCoord.x.toInt() + ", " + sCoord.y.toInt(), Toast.LENGTH_SHORT).show()
-	}*/
+//	private fun doubleTap(me: MotionEvent) {
+//		//val sCoord = imgPlano.viewToSourceCoord(me.x, me.y)
+//		//Toast.makeText(this@MapaActivity, "Double tap: " + sCoord.x.toInt() + ", " + sCoord.y.toInt(), Toast.LENGTH_SHORT).show()
+//	}
 	//______________________________________________________________________________________________
 	private fun longPress(me: MotionEvent) {
 		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
-		viewModel.punto(PointF(pto.x, pto.y), imgPlano)
+		val pto100 = imgPlano.coordImgTo100(pto)
+		viewModel.punto(pto, pto100)
 		//Toast.makeText(this@MapaActivity, "Long press: "+pto.x+", "+pto.y, Toast.LENGTH_SHORT).show()
 		//TODO: Show context menu: desde aqui, hasta aqui, infoPuesto, admin:addPuesto, admin:delPuesto ...
 	}
 	//______________________________________________________________________________________________
-//	private fun singleTapConfirmed(me: MotionEvent) {
-//		//val sCoord = calcCoordenadas(me.x, me.y)
-//		//Toast.makeText(this@MapaActivity, "Single tap: "+sCoord.x+", "+sCoord.y, Toast.LENGTH_SHORT).show()
-//	}
+	private fun singleTapConfirmed(me: MotionEvent) {
+		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
+		val pto100 = imgPlano.coordImgTo100(pto)
+		viewModel.punto(pto, pto100)
+	}
 
 
 	////////////////// IMG VIEW
 	//______________________________________________________________________________________________
-	private fun drawCamino(camino: Array<PointF>) {
+	private fun showCamino(camino: Array<PointF>) {
 		imgPlano.setCamino(camino)
 	}
 	private fun delCamino() {
@@ -215,6 +218,15 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	private fun drawEnd(pto: PointF?) {
 		imgPlano.setEnd(pto)
+	}
+
+	//______________________________________________________________________________________________
+	private fun showPuestos(puestos: List<Workstation>) {
+//		for(puesto in puestos) {
+//			val coord: PointF = imgPlano.coord100ToImg(PointF(puesto.x, puesto.y))
+//			imgPlano.show
+//		}
+		imgPlano.setPuestos(puestos)
 	}
 
 

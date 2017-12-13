@@ -1,5 +1,6 @@
 package com.cesoft.puestos.data.fire
 
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,7 +16,9 @@ class Fire {
 	private val db = FirebaseFirestore.getInstance()
 	//private var gson = Gson()
 
-	fun getRef(collection: String, document: String): DocumentReference
+	fun getCol(collection: String): CollectionReference
+			= db.collection(collection)
+	fun getDoc(collection: String, document: String): DocumentReference
 			= db.collection(collection).document(document)
 
 	fun translate(res: DocumentSnapshot, clase: Class<*>): Any {

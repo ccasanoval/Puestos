@@ -11,8 +11,7 @@ data class Status(
 	var idUserUsing: Long = 0L,
 	var type: Type = Type.Libre,
 	var ini: String = "2017-11-29",
-	var end: String = "2017-11-29"
-)
+	var end: String = "2017-11-29")
 {
-	enum class Type { Libre, Ocupado }
+	enum class Type(name: String) { Libre("Libre"), Ocupado("Ocupado") }
 }

@@ -6,11 +6,14 @@ import com.cesoft.puestos.models.User
 /**
  * Created by ccasanova on 01/12/2017
  */
-class UserFire {
+////////////////////////////////////////////////////////////////////////////////////////////////////
+object UserFire {
+	private val TAG: String = User::class.java.simpleName
+	private val ROOT_COLLECTION = "usuarios"
 
 	//______________________________________________________________________________________________
 	fun get(fire: Fire, email: String, callback: (User, Throwable?) -> Unit) {
-		fire.getRef(ROOT_COLLECTION, email)
+		fire.getDoc(ROOT_COLLECTION, email)
 			.get()
 			.addOnCompleteListener({ task ->
 				if(task.isSuccessful) {
@@ -22,11 +25,5 @@ class UserFire {
 					callback(User(), task.exception)
 				}
 			})
-	}
-
-	//______________________________________________________________________________________________
-	companion object {
-		val TAG: String = User::class.java.simpleName
-		val ROOT_COLLECTION = "usuarios"
 	}
 }
