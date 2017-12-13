@@ -1,4 +1,6 @@
-package com.cesoft.puestos
+package com.cesoft.puestos.util
+
+import com.cesoft.puestos.BuildConfig
 
 /**
  * Created by ccasanova on 08/11/2017
@@ -8,4 +10,5 @@ object Log {
 		if(BuildConfig.DEBUG)
 			android.util.Log.e(tag, msg, e)
 	}
+	//FirebaseCrash.log("Activity created");
 }

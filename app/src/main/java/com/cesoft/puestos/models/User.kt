@@ -5,8 +5,9 @@ package com.cesoft.puestos.models
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 data class User(
-	var id: Long = 0L,
-	var name: String = "?",
+	//var id: Long = 0L,
+	var id: String = "",
+	var name: String = "",
 	var type: Type = Type.User)
 {
 	enum class Type(name: String) { Admin("Admin"), User("User") }

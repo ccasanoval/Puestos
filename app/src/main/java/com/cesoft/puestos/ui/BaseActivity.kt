@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import com.cesoft.puestos.App
-import com.cesoft.puestos.Log
+import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.ui.login.LoginActivity
 import com.google.firebase.auth.FirebaseAuth

@@ -11,7 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.cesoft.puestos.Log
+import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.App
 import com.cesoft.puestos.data.auth.Auth

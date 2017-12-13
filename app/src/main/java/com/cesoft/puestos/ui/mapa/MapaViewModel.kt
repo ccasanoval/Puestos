@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.PointF
 import com.cesoft.puestos.App
-import com.cesoft.puestos.Log
+import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
@@ -17,6 +17,7 @@ import com.cesoft.puestos.models.Workstation
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlin.math.abs
 
 /**
  * Created by ccasanova on 29/11/2017
@@ -75,10 +76,11 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	}
 
 	//______________________________________________________________________________________________
-	private fun getPuestos() {
+	private fun getPuestos(callback: () -> Unit = {}) {
 		WorkstationFire.getAll(fire, { lista, error ->
 			if(error == null) {
 				puestos.value = lista.toList()
+				callback()
 				Log.e(TAG, "getPuestos:------------------------------------------------------"+lista.size)
 			}
 			else {
@@ -87,13 +89,23 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 		})
 	}
+
 	//______________________________________________________________________________________________
 	private fun info(pto: PointF, pto100: PointF) {
 		Log.e(TAG, "TODO: info ***************************************************************")
 		//TODO: Mostrar pantalla que permite eliminar, modificar o crear puesto
 		//TODO: Buscar workstation por punto
-		//	location: new firebase.firestore.GeoPoint(latitude, longitude)
 		// Aun no hay soporte en Firestore para consultas por cercania de GeoPoints
+		if(puestos.value != null && puestos.value!!.isNotEmpty()) {
+			for(puesto in puestos.value!!) {
+				if( abs(puesto.x - pto100.x) < 1 && abs(puesto.y - pto100.y) < 1) {
+					Log.e(TAG, "TODO: info: PTO="+puesto.name+" : "+puesto)
+				}
+			}
+		}
+		else {
+			getPuestos()
+		}
 
 	}
 	//______________________________________________________________________________________________

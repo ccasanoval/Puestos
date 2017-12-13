@@ -3,7 +3,7 @@ package com.cesoft.puestos.ui
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import com.cesoft.puestos.Log
+import com.cesoft.puestos.util.Log
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.cesoft.puestos.R.drawable
 import com.cesoft.puestos.models.Workstation
@@ -144,7 +144,7 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 			//Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
 			val x = ptoView.x - imgIni!!.width / 2
 			val y = ptoView.y - imgIni!!.height
-			canvas.drawBitmap(imgIni!!, ptoIni!!.x, ptoIni!!.y, paint)
+			canvas.drawBitmap(imgIni!!, x, y, paint)
 		}
 	}
 	//______________________________________________________________________________________________

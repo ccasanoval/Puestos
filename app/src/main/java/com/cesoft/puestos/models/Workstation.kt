@@ -5,9 +5,11 @@ package com.cesoft.puestos.models
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 data class Workstation(
-	var id: Long = 0,
+	//var id: Long = 0,
+	//var id: String,
+	var idOwner: String,
+	var name: String,
 	var x: Float = 0f,
-	var y: Float = 0f,
-	var name: String = "?"
+	var y: Float = 0f
 )
 

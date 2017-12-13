@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import com.cesoft.puestos.Log
+import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.ui.BaseActivity
@@ -65,8 +65,6 @@ class MapaActivity : BaseActivity() {
 
 	//______________________________________________________________________________________________
 	private fun iniViewModel() {
-		///////////// ViewModel Observers
-		//
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
 		viewModel.mensaje.observe(this, Observer { mensaje ->
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
@@ -80,6 +78,8 @@ class MapaActivity : BaseActivity() {
 		})
 		viewModel.puestos.observe(this, Observer<List<Workstation>> { puestos ->
 			when {
+				viewModel.modo != MapaViewModel.Modo.Puestos ->
+					Log.e(TAG, "iniViewModel:puestos:observe:-----------------SIN MODO PUESTOS")
 				puestos == null ->
 					Toast.makeText(this@MapaActivity, getString(R.string.puestos_get_error), Toast.LENGTH_SHORT).show()
 				puestos.isEmpty() ->

@@ -1,5 +1,6 @@
 package com.cesoft.puestos.data.fire
 
+import com.cesoft.puestos.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -21,9 +22,17 @@ class Fire {
 	fun getDoc(collection: String, document: String): DocumentReference
 			= db.collection(collection).document(document)
 
-	fun translate(res: DocumentSnapshot, clase: Class<*>): Any {
+	//______________________________________________________________________________________________
+	fun translate(res: DocumentSnapshot, clase: Class<*>): Any? {
 		//val json = gson.toJsonTree(res.data)
 		//val objeto = gson.fromJson(json, clase)
-		return res.toObject(clase)
+		try {
+			//if(res != null)
+			return res.toObject(clase)
+		}
+		catch(e: Exception) {
+			Log.e("Fire", "translate:e:----------------------------------------------------",e)
+		}
+		return null
 	}
 }

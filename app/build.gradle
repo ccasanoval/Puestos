@@ -34,7 +34,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$sdk"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
@@ -56,14 +56,13 @@ dependencies {
     // Firebase
     implementation "com.google.firebase:firebase-firestore:$fire"
     implementation "com.google.firebase:firebase-auth:$fire"
+    implementation "com.google.firebase:firebase-crash:$fire"
 
     /// Json
     implementation 'com.google.code.gson:gson:2.8.1'
 
     /// Rx
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    // Because RxAndroid releases are few and far between, it is recommended you also
-    // explicitly depend on RxJava's latest version for bug fixes and new features.
     implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
 
     /// Leak Canary

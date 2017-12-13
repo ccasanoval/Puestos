@@ -1,7 +1,7 @@
 package com.cesoft.puestos.data.fire
 
-import com.cesoft.puestos.Log
 import com.cesoft.puestos.models.User
+import com.cesoft.puestos.util.Log
 
 /**
  * Created by ccasanova on 01/12/2017
@@ -9,7 +9,7 @@ import com.cesoft.puestos.models.User
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 object UserFire {
 	private val TAG: String = User::class.java.simpleName
-	private val ROOT_COLLECTION = "usuarios"
+	private val ROOT_COLLECTION = "users"
 
 	//______________________________________________________________________________________________
 	fun get(fire: Fire, email: String, callback: (User, Throwable?) -> Unit) {

@@ -8,7 +8,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.cesoft.puestos.Log
 
 
 /**
