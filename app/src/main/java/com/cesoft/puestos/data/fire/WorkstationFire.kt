@@ -4,6 +4,7 @@ import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.util.Log
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 
 
@@ -24,7 +25,6 @@ object WorkstationFire {
 	private val FIELD_NAME = "name"
 	private val FIELD_STATUS = "status"
 
-	//______________________________________________________________________________________________
 	//______________________________________________________________________________________________
 	fun getAll(fire: Fire, callback: (ArrayList<Workstation>, Throwable?) -> Unit) {
 		fire.getCol(ROOT_COLLECTION)
@@ -62,7 +62,6 @@ object WorkstationFire {
 				}
 			})
 	}
-
 	//______________________________________________________________________________________________
 	fun createPuestoHelper(fire: Fire, doc: DocumentSnapshot): Workstation? {
 		val puesto = fire.translate(doc, Workstation::class.java) as Workstation?
@@ -71,6 +70,46 @@ object WorkstationFire {
 			return puesto.copy(doc.id, pos.longitude.toFloat(), pos.latitude.toFloat())
 		}
 		return null
+	}
+
+	//______________________________________________________________________________________________
+	// Find Workstation by User or Owner
+	fun getByOwner(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
+		fire.getCol(ROOT_COLLECTION)
+			.whereEqualTo(FIELD_IDOWNER, idUser)
+			.whereEqualTo(FIELD_IDUSER, "")
+			.get()
+			.addOnCompleteListener({ task: Task<QuerySnapshot> ->
+				if(task.isSuccessful) {
+					Log.e(TAG, "getByOwner:----------------------------------------------------")
+
+					task.result.forEach { doc ->
+						val puesto = createPuestoHelper(fire, doc)
+						callback(puesto, null)
+						return@forEach
+					}
+				}
+				else
+					callback(null, task.exception)
+			})
+	}
+	//______________________________________________________________________________________________
+	// Find Workstation by User
+	fun getByUser(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
+		fire.getCol(ROOT_COLLECTION)
+			.whereEqualTo(FIELD_IDUSER, idUser)
+			.get()
+			.addOnCompleteListener({ task: Task<QuerySnapshot> ->
+				if(task.isSuccessful)  {
+					task.result.forEach { doc ->
+						val puesto = createPuestoHelper(fire, doc)
+						callback(puesto, null)
+						return@forEach
+					}
+				}
+				else
+					callback(null, task.exception)
+			})
 	}
 
 	//______________________________________________________________________________________________
@@ -91,5 +130,14 @@ object WorkstationFire {
 		})
 		.addOnSuccessListener(OnSuccessListener { result -> Log.e(TAG, "Transaction success: " + result!!) })
 		.addOnFailureListener(OnFailureListener { e -> Log.e(TAG, "Transaction failure.", e) })
+	}
+
+	//______________________________________________________________________________________________
+	fun liberar(fire: Fire, id: String, idUser: String) {
+
+	}
+	//______________________________________________________________________________________________
+	fun guardar(fire: Fire, id: String, idUser: String) {
+
 	}
 }

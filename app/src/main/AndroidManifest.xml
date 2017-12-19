@@ -19,8 +19,9 @@
         <activity android:name=".ui.login.LoginActivity"/>
         <activity
             android:name=".ui.puesto.PuestoDialog"
-            android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Dialog"/>
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true" />
+            <!-- android:theme="@style/Theme.AppCompat.Dialog"/ -->
     </application>
 
 </manifest>

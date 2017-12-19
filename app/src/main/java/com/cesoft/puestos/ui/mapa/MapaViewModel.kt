@@ -32,6 +32,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	val usuario = MutableLiveData<String>()
 	val puestos = MutableLiveData<List<Workstation>>()
 	val selected = MutableLiveData<Workstation>()
+	val wsOwn = MutableLiveData<Workstation>()
 	val camino = MutableLiveData<Array<PointF>>()
 	val ini = MutableLiveData<PointF>()
 	val end = MutableLiveData<PointF>()
@@ -48,19 +49,17 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 		}
 
+	//______________________________________________________________________________________________
 	init {
 		puestos.value = listOf()
-		Log.e(TAG, "init:-------------------------------------------------0 ")
-
 		Log.e(TAG, "init:-------------------------------------------------"+user)
-		if(user != null)
-			usuario.value = user.name + " : " + user.type
 	}
 
+	//______________________________________________________________________________________________
 	fun logout() { auth.logout() }
 
+	//______________________________________________________________________________________________
 	fun punto(pto: PointF, pto100: PointF) {
-
 		when(modo) {
 			Modo.Ruta -> ruta(pto, pto100)
 			Modo.Info -> info(pto, pto100)
@@ -68,6 +67,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		}
 	}
 
+	//______________________________________________________________________________________________
 	private fun getPuestosRT() {
 		WorkstationFire.getAllRT(fire, { lista, error ->
 			if(error == null) {
@@ -80,8 +80,9 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 		})
 	}
-	private fun getPuestos(callback: (List<Workstation>) -> Unit = {}) {
-		WorkstationFire.getAll(fire, { lista, error ->
+	//______________________________________________________________________________________________
+	private fun getPuestosRT(callback: (List<Workstation>) -> Unit = {}) {
+		WorkstationFire.getAllRT(fire, { lista, error ->
 			if(error == null) {
 				puestos.value = lista.toList()
 				callback(lista.toList())
@@ -94,17 +95,19 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		})
 	}
 
+	//______________________________________________________________________________________________
 	private fun info(pto: PointF, pto100: PointF) {
-		Log.e(TAG, "info:----------------------------"+pto100+" / "+pto)
+		Log.e(TAG, "info:--------------------------------"+pto100+" / "+pto)
 		//TODO: Mostrar pantalla que permite eliminar, modificar o crear puesto: Dependiendo de user y type user
 		//TODO: Buscar workstation cercania: Aun no hay soporte en Firestore para consultas por radio de GeoPoints
 		if(puestos.value != null && puestos.value!!.isNotEmpty()) {
 			infoHelper(puestos.value!!, pto, pto100)
 		}
 		else {
-			getPuestos({ lospuestos -> infoHelper(lospuestos, pto, pto100) })
+			getPuestosRT({ lospuestos -> infoHelper(lospuestos, pto, pto100) })
 		}
 	}
+	//______________________________________________________________________________________________
 	private fun infoHelper(puestos: List<Workstation>, pto: PointF, pto100: PointF) {
 		//TODO: usar pto + tamaño bits icono...... ¿?
 		val MAX = 3f
@@ -124,6 +127,8 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		}
 		selected.value = seleccionado
 	}
+
+	//______________________________________________________________________________________________
 	private fun ruta(pto: PointF, pto100: PointF) {
 		camino.value = null
 		if(pto100.x < 0 || pto100.x >= 100 || pto100.y < 0 || pto100.y >= 100) {
@@ -141,21 +146,22 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			end.value = pto
 
 			/// En otro hilo
-
 			Observable.defer({
 				Observable.just(plane.calcRuta(ini100, end100))
 			})
-				.subscribeOn(Schedulers.newThread())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe({it ->
-					camino.value = it.data
-					if(it.data == null) {
-						mensaje.value = getApplication<App>().getString(R.string.error_camino)
-					}
-					Log.e(TAG, "punto:calc-ruta: ok="+it.isOk+", pasosBusqueda="+it.pasosBusqueda+", pasos="+it.pasos)
-				})
+			.subscribeOn(Schedulers.newThread())
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe({it ->
+				camino.value = it.data
+				if(it.data == null) {
+					mensaje.value = getApplication<App>().getString(R.string.error_camino)
+				}
+				Log.e(TAG, "punto:calc-ruta: ok="+it.isOk+", pasosBusqueda="+it.pasosBusqueda+", pasos="+it.pasos)
+			})
 		}
 	}
+
+	//______________________________________________________________________________________________
 	companion object {
 		private val TAG: String = MapaViewModel::class.java.simpleName
 	}

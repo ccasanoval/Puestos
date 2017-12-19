@@ -11,6 +11,7 @@ import android.widget.Toast
 import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.data.parcelables.WorkstationParcelable
+import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.ui.BaseActivity
 import com.cesoft.puestos.ui.dlg.SiNoDialog
@@ -28,6 +29,7 @@ class MapaActivity : BaseActivity() {
 	private lateinit var viewModel : MapaViewModel
 	private var imgListener: View.OnTouchListener ?=null
 
+	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.act_main)
@@ -44,19 +46,21 @@ class MapaActivity : BaseActivity() {
 		iniViewModel()
 	}
 
+	//______________________________________________________________________________________________
 	override fun onDestroy() {
 		super.onDestroy()
 		imgPlano.destroyDrawingCache()
 		imgPlano.recycle()
 	}
 
+	//______________________________________________________________________________________________
 	private fun iniViewModel() {
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
 		viewModel.mensaje.observe(this, Observer { mensaje ->
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})
 		viewModel.usuario.observe(this, Observer<String> { usuario ->
-			setTituloFromEmail(usuario)
+			setTitulo(usuario)
 		})
 		viewModel.camino.observe(this, Observer<Array<PointF>> { camino ->
 			if(camino == null)	delCamino()
@@ -74,13 +78,21 @@ class MapaActivity : BaseActivity() {
 					showPuestos(puestos)
 			}
 		})
-		viewModel.selected.observe(this, Observer<Workstation>{ pto -> showSeleccionado(pto) })
+		viewModel.selected.observe(this, Observer<Workstation> { pto ->
+			showSeleccionado(pto)
+			if(pto != null) {
+				viewModel.selected.value = null
+			}
+		})
+		viewModel.wsOwn.observe(this, Observer<Workstation> { pto ->
+			showWSOwn(pto)
+		})
 		viewModel.ini.observe(this, Observer<PointF>{ pto -> showPointF(true,pto) })
 		viewModel.end.observe(this, Observer<PointF>{ pto -> showPointF(false,pto) })
 	}
 
 	//______________________________________________________________________________________________
-	private fun setTituloFromEmail(titulo: String?) {
+	private fun setTitulo(titulo: String?) {
 		if(titulo!=null) {
 			val i = titulo.indexOf('@')
 			title = if(i > 0) titulo.substring(0, i)
@@ -121,6 +133,7 @@ class MapaActivity : BaseActivity() {
 		return true
 	}
 
+	//______________________________________________________________________________________________
 	private fun getGestureDetector() =
 		GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
 			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -132,25 +145,33 @@ class MapaActivity : BaseActivity() {
 			}
 		})
 
+	//______________________________________________________________________________________________
 	private fun singleTapConfirmed(me: MotionEvent) {
 		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
 		val pto100 = imgPlano.coordImgTo100(pto)
 		viewModel.punto(pto, pto100)
 	}
 
+	//______________________________________________________________________________________________
 	private fun showCamino(camino: Array<PointF>) {
 		imgPlano.setCamino(camino)
 	}
+	//______________________________________________________________________________________________
 	private fun delCamino() {
 		imgPlano.delCamino()
 	}
+	//______________________________________________________________________________________________
 	private fun showPointF(initial:Boolean, pto:PointF?){
 		imgPlano.setPoint(initial,pto)
 	}
+	//______________________________________________________________________________________________
 	private fun showPuestos(puestos: List<Workstation>) {
+		if(puestos.isNotEmpty())
+		Log.e(TAG, "showPuestos : ----------x="+puestos[0].x)
 		imgPlano.setPuestos(puestos)
 	}
 
+	//______________________________________________________________________________________________
 	private fun showSeleccionado(puesto: Workstation?) {
 		imgPlano.setSeleccionado(puesto)
 		if(puesto != null) {
@@ -158,6 +179,24 @@ class MapaActivity : BaseActivity() {
 			intent.putExtra(Workstation::class.java.name, WorkstationParcelable(puesto))
 			startActivity(intent)
 		}
+	}
+	//______________________________________________________________________________________________
+	private fun showWSOwn(puesto: Workstation?) {
+		imgPlano.setWSOwn(puesto)
+	}
+
+	//______________________________________________________________________________________________
+	override fun onUser(user: User) {
+		//if(user != null)
+		viewModel.usuario.value = user.name + " : " + user.type
+	}
+	//______________________________________________________________________________________________
+	override fun onWorkstationOwn(wsOwn: Workstation?) {
+		viewModel.wsOwn.value = wsOwn
+	}
+	//______________________________________________________________________________________________
+	override fun onWorkstationUse(wsUse: Workstation?) {
+		viewModel.wsOwn.value = wsUse
 	}
 
 

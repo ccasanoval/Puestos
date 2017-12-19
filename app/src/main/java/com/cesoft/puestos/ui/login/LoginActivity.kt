@@ -65,17 +65,17 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
 		auth.login(email, password, { auth: Auth, exception: Exception? ->
 			if(auth.isLogedIn() && exception == null) {
-				Log.e(TAG, "signInWithEmail:success----------------------")
-					updateUI(auth.getEmail())
-					val intent = Intent(this, MapaActivity::class.java)
-					startActivity(intent)
-					finish()
+				Log.e(TAG, "signInWithEmail:success--------------------------------------------")
+				updateUI(auth.getEmail())
+				val intent = Intent(this, MapaActivity::class.java)
+				startActivity(intent)
+				finish()
 			}
 			else {
-				Log.e(TAG, "signInWithEmail:failure-------------------------", exception)
-					Toast.makeText(this@LoginActivity, R.string.error_login, Toast.LENGTH_SHORT).show()
-					updateUI(null)
-					txtStatus.setText(R.string.error_login)
+				Log.e(TAG, "signInWithEmail:failure--------------------------------------------", exception)
+				Toast.makeText(this@LoginActivity, R.string.error_login, Toast.LENGTH_SHORT).show()
+				updateUI(null)
+				txtStatus.setText(R.string.error_login)
 			}
 		})
 	}

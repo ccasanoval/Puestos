@@ -30,11 +30,17 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var camino: Array<PointF>? = null
 
 	private var puestos: List<Workstation>? = null
+	private var puestos100: List<Workstation>? = null
 	private var imgFree: Bitmap? = null
 	private var imgOccupied: Bitmap? = null
 	private var imgUnavailable: Bitmap? = null
 	private var seleccionado: Workstation? = null
 	private var imgSelected: Bitmap? = null
+
+	private var imgWSOwn: Bitmap? = null
+	private var wsOwn: Workstation? = null
+	private var wsOwn100: Workstation? = null
+
 
 	//______________________________________________________________________________________________
 	init {
@@ -64,6 +70,12 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		imgUnavailable = Bitmap.createScaledBitmap(imgUnavailable!!, w.toInt(), h.toInt(), true)
 		imgSelected = Bitmap.createScaledBitmap(imgSelected!!, w.toInt(), h.toInt(), true)
 
+		/// Home
+		imgWSOwn = BitmapFactory.decodeResource(this.resources, drawable.pto_home)
+		w = density / 720f * imgWSOwn!!.width
+		h = density / 720f * imgWSOwn!!.height
+		imgWSOwn = Bitmap.createScaledBitmap(imgWSOwn!!, w.toInt(), h.toInt(), true)
+
 		/// Camino
 		strokeWidth = (density / 60f).toInt()
 	}
@@ -72,6 +84,9 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	override fun onReady() {
 		super.onReady()
 		setCamino(caminoOrg)
+		setWSOwn(wsOwn100)
+		if(puestos100 != null)
+			setPuestos(puestos100!!)
 	}
 	//______________________________________________________________________________________________
 	fun setPoint(init:Boolean, pto: PointF?){
@@ -94,12 +109,18 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		invalidate()
 	}
 	//______________________________________________________________________________________________
-	fun setPuestos(puestos: List<Workstation>) {
-		this.puestos = List(puestos.size, { it ->
-			val coord: PointF = coord100ToImg(PointF(puestos[it].x, puestos[it].y))
-			puestos[it].createNewWithPosition(coord.x, coord.y)
-		})
-		invalidate()
+	fun setPuestos(lospuestos: List<Workstation>) {
+		if( ! isReady) {
+			puestos100 = lospuestos
+		}
+		else {
+			puestos = List(lospuestos.size, { it ->
+				val coord: PointF = coord100ToImg(PointF(lospuestos[it].x, lospuestos[it].y))
+				lospuestos[it].createNewWithPosition(coord.x, coord.y)
+			})
+			puestos100 = null
+			invalidate()
+		}
 	}
 	//______________________________________________________________________________________________
 	fun setSeleccionado(puesto: Workstation?) {
@@ -109,10 +130,21 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		}
 		invalidate()
 	}
+	//______________________________________________________________________________________________
+	fun setWSOwn(puesto: Workstation?) {
+		if( ! isReady) {
+			wsOwn100 = puesto
+		}
+		else if(puesto != null) {
+			val coord: PointF = coord100ToImg(PointF(puesto.x, puesto.y))
+			wsOwn = puesto.createNewWithPosition(coord.x, coord.y)
+			wsOwn100 = null
+		}
+		invalidate()
+	}
 
 	//______________________________________________________________________________________________
 	private fun coord100ToImg(pto: PointF): PointF {
-		if( ! isReady)return PointF(0f,0f)
 		val x = pto.x *sWidth/100f
 		val y = pto.y * sHeight/100f
 		return PointF(x, y)
@@ -141,6 +173,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		drawPuestos(canvas)
 		/// SELECCIONADO
 		drawSeleccionado(canvas)
+		/// HOME
+		drawWSOwn(canvas)
 	}
 	//______________________________________________________________________________________________
 	private fun draw(isInitial: Boolean, canvas: Canvas){
@@ -216,6 +250,16 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			sourceToViewCoord(PointF(seleccionado!!.x, seleccionado!!.y), ptoView)
 			val img = imgSelected!!
 			val x = ptoView.x - img.width / 2
+			val y = ptoView.y - img.height / 2
+			canvas.drawBitmap(img, x, y, paint)
+		}
+	}
+	//______________________________________________________________________________________________
+	fun drawWSOwn(canvas: Canvas) {
+		if(wsOwn != null) {
+			sourceToViewCoord(PointF(wsOwn!!.x, wsOwn!!.y), ptoView)
+			val img = imgWSOwn!!
+			val x = ptoView.x - img.width  /2
 			val y = ptoView.y - img.height /2
 			canvas.drawBitmap(img, x, y, paint)
 		}

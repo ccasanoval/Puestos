@@ -4,6 +4,7 @@ import android.app.Application
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.models.User
+import com.cesoft.puestos.models.Workstation
 import com.squareup.leakcanary.LeakCanary
 
 
@@ -41,6 +42,8 @@ class App : Application() {
 	lateinit var auth: Auth
 	lateinit var fire: Fire
 	var user: User? = null
+	var wsOwn: Workstation? = null
+	var wsUse: Workstation? = null
 
 	//______________________________________________________________________________________________
 	override fun onCreate() {
