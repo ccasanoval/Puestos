@@ -5,11 +5,15 @@ package com.cesoft.puestos.models
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 data class Workstation(
-	//var id: Long = 0,
-	//var id: String,
-	var idOwner: String,
-	var name: String,
-	var x: Float = 0f,
-	var y: Float = 0f
-)
-
+	val id: String = "",
+	val idOwner: String = "",
+	val idUser: String = "",
+	val name: String = "",
+	var status: Status = Status.Unavailable,
+	val x: Float = 0f,
+	val y: Float = 0f)
+{
+	enum class Status(name: String) { Free("Free"), Occupied("Occupied"), Unavailable("Unavailable") }
+	fun createNewWithPosition(x: Float, y: Float) = Workstation(id, idOwner, idUser, name, status, x, y)
+	fun copy(id: String, x: Float, y: Float) = Workstation(id, idOwner, idUser, name, status, x, y)
+}

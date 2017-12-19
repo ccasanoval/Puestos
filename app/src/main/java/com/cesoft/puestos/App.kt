@@ -3,6 +3,7 @@ package com.cesoft.puestos
 import android.app.Application
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
+import com.cesoft.puestos.models.User
 import com.squareup.leakcanary.LeakCanary
 
 
@@ -39,7 +40,9 @@ import com.squareup.leakcanary.LeakCanary
 class App : Application() {
 	lateinit var auth: Auth
 	lateinit var fire: Fire
+	var user: User? = null
 
+	//______________________________________________________________________________________________
 	override fun onCreate() {
 		super.onCreate()
 

@@ -2,6 +2,7 @@ package com.cesoft.puestos.ui.mapa
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
 import android.os.Bundle
@@ -9,12 +10,13 @@ import android.view.*
 import android.widget.Toast
 import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.R
+import com.cesoft.puestos.data.parcelables.WorkstationParcelable
 import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.ui.BaseActivity
-import com.cesoft.puestos.ui.CesImgView
-import com.cesoft.puestos.ui.ViewField.enlaza
-import com.cesoft.puestos.ui.dlg.Dlg
+import com.cesoft.puestos.ui.dlg.SiNoDialog
+import com.cesoft.puestos.ui.puesto.PuestoDialog
 import com.davemorrissey.labs.subscaleview.ImageSource
+import kotlinx.android.synthetic.main.act_main.*
 
 
 /**
@@ -24,46 +26,30 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 class MapaActivity : BaseActivity() {
 
 	private lateinit var viewModel : MapaViewModel
-	private val imgPlano: CesImgView by enlaza(R.id.imgPlano)
 	private var imgListener: View.OnTouchListener ?=null
 
-
-	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)//BaseActivity@onCreate(savedInstanceState)
+		super.onCreate(savedInstanceState)
 		setContentView(R.layout.act_main)
 
 		val toolbar: Toolbar = findViewById(R.id.toolbar)
 		setSupportActionBar(toolbar)
-
-		//imgPlano = findViewById(R.id.imgPlano)//https://medium.com/@quiro91/improving-findviewbyid-with-kotlin-4cf2f8f779bb
-		//imgPlano.setImage(ImageSource.resource(R.drawable.plano))
 		imgPlano.setImage(ImageSource.asset("plano.jpg"))
-		//imgPlano.setImage(ImageSource.uri("/sdcard/DCIM/DSCM00123.JPG"));
-
-		//imgPlano.setDoubleTapZoomDuration(200)
-		//imgPlano.setDoubleTapZoomScale()
-		//imgPlano.setOnTouchListener { _, motionEvent -> getGestureDetector().onTouchEvent(motionEvent) }
-
 		val gesture = getGestureDetector()//Si no uso esta variable, deja de funcionar bien ¿?¿?
 		imgListener = View.OnTouchListener { _, motionEvent ->
 			gesture.onTouchEvent(motionEvent)
 		}
 		imgPlano.setOnTouchListener(imgListener)
-		//setMinimumDpi
-		//registerForContextMenu(imgPlano)
 
 		iniViewModel()
 	}
-	//______________________________________________________________________________________________
+
 	override fun onDestroy() {
 		super.onDestroy()
 		imgPlano.destroyDrawingCache()
 		imgPlano.recycle()
-		//System.gc()
 	}
 
-	//______________________________________________________________________________________________
 	private fun iniViewModel() {
 		viewModel = ViewModelProviders.of(this).get(MapaViewModel::class.java)
 		viewModel.mensaje.observe(this, Observer { mensaje ->
@@ -78,7 +64,7 @@ class MapaActivity : BaseActivity() {
 		})
 		viewModel.puestos.observe(this, Observer<List<Workstation>> { puestos ->
 			when {
-				viewModel.modo != MapaViewModel.Modo.Puestos ->
+				viewModel.modo != MapaViewModel.Modo.Puestos -> // && viewModel.modo != MapaViewModel.Modo.Info ->
 					Log.e(TAG, "iniViewModel:puestos:observe:-----------------SIN MODO PUESTOS")
 				puestos == null ->
 					Toast.makeText(this@MapaActivity, getString(R.string.puestos_get_error), Toast.LENGTH_SHORT).show()
@@ -88,8 +74,9 @@ class MapaActivity : BaseActivity() {
 					showPuestos(puestos)
 			}
 		})
-		viewModel.ini.observe(this, Observer<PointF>{ pto -> drawIni(pto) })
-		viewModel.end.observe(this, Observer<PointF>{ pto -> drawEnd(pto) })
+		viewModel.selected.observe(this, Observer<Workstation>{ pto -> showSeleccionado(pto) })
+		viewModel.ini.observe(this, Observer<PointF>{ pto -> showPointF(true,pto) })
+		viewModel.end.observe(this, Observer<PointF>{ pto -> showPointF(false,pto) })
 	}
 
 	//______________________________________________________________________________________________
@@ -97,7 +84,7 @@ class MapaActivity : BaseActivity() {
 		if(titulo!=null) {
 			val i = titulo.indexOf('@')
 			title = if(i > 0) titulo.substring(0, i)
-					else titulo
+			else titulo
 		}
 	}
 
@@ -124,7 +111,7 @@ class MapaActivity : BaseActivity() {
 			}
 			R.id.act_logout -> {
 				Log.e(TAG, "onOptionsItemSelected:action_logout:----------------------------------------------")
-				Dlg.showSiNo(this,
+				SiNoDialog.show(this,
 						getString(R.string.seguro_logout),
 						{ si -> if(si) viewModel.logout() })
 			}
@@ -134,25 +121,6 @@ class MapaActivity : BaseActivity() {
 		return true
 	}
 
-	//______________________________________________________________________________________________
-	/*override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-		super.onRestoreInstanceState(savedInstanceState)
-		Log.e(TAG, "onRestoreInstanceState:-------------------------------------------------")
-		//if (savedInstanceState?.containsKey(BUNDLE_PAGE) == true)page = savedInstanceState.getInt(BUNDLE_PAGE)
-	}
-	override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-		super.onRestoreInstanceState(savedInstanceState, persistentState)
-		Log.e(TAG, "onRestoreInstanceState:2-------------------------------------------------")
-	}
-	//______________________________________________________________________________________________
-	override fun onSaveInstanceState(outState: Bundle?) {
-		super.onSaveInstanceState(outState)
-		//outState?.putInt(BUNDLE_PAGE, page)
-		Log.e(TAG, "onSaveInstanceState:-------------------------------------------------")
-
-	}*/
-
-	//______________________________________________________________________________________________
 	private fun getGestureDetector() =
 		GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
 			override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -162,71 +130,34 @@ class MapaActivity : BaseActivity() {
 					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
 				return false
 			}
-
-			override fun onLongPress(e: MotionEvent) {
-				if(imgPlano.isReady)
-					longPress(e)
-				else
-					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-			}
-
-//			override fun onDoubleTap(e: MotionEvent): Boolean {
-//				if(imgPlano.isReady)
-//					doubleTap(e)
-//				else
-//					Toast.makeText(this@MapaActivity, getString(R.string.cargando_imagen), Toast.LENGTH_SHORT).show()
-//				return false
-//			}
 		})
 
-
-
-
-	//______________________________________________________________________________________________
-//	private fun doubleTap(me: MotionEvent) {
-//		//val sCoord = imgPlano.viewToSourceCoord(me.x, me.y)
-//		//Toast.makeText(this@MapaActivity, "Double tap: " + sCoord.x.toInt() + ", " + sCoord.y.toInt(), Toast.LENGTH_SHORT).show()
-//	}
-	//______________________________________________________________________________________________
-	private fun longPress(me: MotionEvent) {
-		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
-		val pto100 = imgPlano.coordImgTo100(pto)
-		viewModel.punto(pto, pto100)
-		//Toast.makeText(this@MapaActivity, "Long press: "+pto.x+", "+pto.y, Toast.LENGTH_SHORT).show()
-		//TODO: Show context menu: desde aqui, hasta aqui, infoPuesto, admin:addPuesto, admin:delPuesto ...
-	}
-	//______________________________________________________________________________________________
 	private fun singleTapConfirmed(me: MotionEvent) {
 		val pto = imgPlano.viewToSourceCoord(me.x, me.y)
 		val pto100 = imgPlano.coordImgTo100(pto)
 		viewModel.punto(pto, pto100)
 	}
 
-
-	////////////////// IMG VIEW
-	//______________________________________________________________________________________________
 	private fun showCamino(camino: Array<PointF>) {
 		imgPlano.setCamino(camino)
 	}
 	private fun delCamino() {
 		imgPlano.delCamino()
 	}
-	//______________________________________________________________________________________________
-	private fun drawIni(pto: PointF?) {
-		imgPlano.setIni(pto)
+	private fun showPointF(initial:Boolean, pto:PointF?){
+		imgPlano.setPoint(initial,pto)
 	}
-	//______________________________________________________________________________________________
-	private fun drawEnd(pto: PointF?) {
-		imgPlano.setEnd(pto)
+	private fun showPuestos(puestos: List<Workstation>) {
+		imgPlano.setPuestos(puestos)
 	}
 
-	//______________________________________________________________________________________________
-	private fun showPuestos(puestos: List<Workstation>) {
-//		for(puesto in puestos) {
-//			val coord: PointF = imgPlano.coord100ToImg(PointF(puesto.x, puesto.y))
-//			imgPlano.show
-//		}
-		imgPlano.setPuestos(puestos)
+	private fun showSeleccionado(puesto: Workstation?) {
+		imgPlano.setSeleccionado(puesto)
+		if(puesto != null) {
+			val intent = Intent(this, PuestoDialog::class.java)
+			intent.putExtra(Workstation::class.java.name, WorkstationParcelable(puesto))
+			startActivity(intent)
+		}
 	}
 
 

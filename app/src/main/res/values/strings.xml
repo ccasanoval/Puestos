@@ -12,6 +12,7 @@
     <string name="campo_obligatorio">Campo obligatorio</string>
     <string name="ok_login">Usuario: %1$s (verificado: %2$b)</string>
     <string name="seguro_logout">¿Seguro que desea cerrar sesión?</string>
+    <string name="seguro_salir_cambios">¿Seguro que desea salir sin guardar</string>
     <string name="desde_aqui">Desde aquí…</string>
     <string name="hasta_aqui">Hasta aquí…</string>
     <string name="acciones">Acciones:</string>
@@ -27,5 +28,28 @@
     <string name="puestos_msg">Lista de puestos</string>
     <string name="puestos_get_error">Error al obtener los puestos</string>
     <string name="puestos_get_none">No se encontraron puestos</string>
+
+    <!-- DLG PUESTO -->
+    <string name="ocupar">Ocupar</string>
+    <string name="liberar">Liberar</string>
+    <string name="cerrar">Cerrar</string>
+    <string name="guardar">Guardar</string>
+
+    <string name="datos_del_puestos">Datos del Puestos</string>
+    <string name="id">ID:</string>
+    <string name="codigo">Código:</string>
+    <string name="propietario">Propietario:</string>
+    <string name="ocupante">Ocupante:</string>
+    <string name="estado">Estado:</string>
+
+    <!-- ENUM: WORSTATION STATUS -->
+    <string name="occupied">Ocupado</string>
+    <string name="free">Libre</string>
+    <string name="unavailable">No disponible</string>
+    <!-- ENUM: USER TYPE -->
+    <string name="admin">Administrador</string>
+    <string name="fixed">Trabajador fijo</string>
+    <string name="interim">Trabajador temporal</string>
+    <string name="manage_own_workstation">Gestionar puesto propio</string>
 
 </resources>

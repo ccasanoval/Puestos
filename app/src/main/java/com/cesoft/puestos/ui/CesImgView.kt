@@ -26,57 +26,57 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 
 	private var strokeWidth: Int = 0
 	private val path = Path()
-	//private var sPoints: MutableList<PointF>? = null
 	private var caminoOrg: Array<PointF>? = null
 	private var camino: Array<PointF>? = null
 
 	private var puestos: List<Workstation>? = null
-	private var imgLibre: Bitmap? = null
-	private var imgOcupado: Bitmap? = null
-
+	private var imgFree: Bitmap? = null
+	private var imgOccupied: Bitmap? = null
+	private var imgUnavailable: Bitmap? = null
+	private var seleccionado: Workstation? = null
+	private var imgSelected: Bitmap? = null
 
 	//______________________________________________________________________________________________
 	init {
 		initialise()
 	}
 	private fun initialise() {
-		//val a = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
 		val density = resources.displayMetrics.densityDpi.toFloat()
 
 		/// Desde Hasta
-		imgIni = BitmapFactory.decodeResource(this.resources, drawable.ini)
-		imgEnd = BitmapFactory.decodeResource(this.resources, drawable.end)
-Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
+		imgIni = BitmapFactory.decodeResource(this.resources, drawable.rute_ini)
+		imgEnd = BitmapFactory.decodeResource(this.resources, drawable.rute_end)
+		Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		var w = density / 420f * imgIni!!.width
 		var h = density / 420f * imgIni!!.height
 		imgIni = Bitmap.createScaledBitmap(imgIni!!, w.toInt(), h.toInt(), true)
 		imgEnd = Bitmap.createScaledBitmap(imgEnd!!, w.toInt(), h.toInt(), true)
 
 		/// Libre Ocupado
-		imgLibre = BitmapFactory.decodeResource(this.resources, drawable.libre)
-		imgOcupado = BitmapFactory.decodeResource(this.resources, drawable.ocupado)
-		w = density / 420f * imgLibre!!.width
-		h = density / 420f * imgLibre!!.height
-		imgLibre = Bitmap.createScaledBitmap(imgLibre!!, w.toInt(), h.toInt(), true)
-		imgOcupado = Bitmap.createScaledBitmap(imgOcupado!!, w.toInt(), h.toInt(), true)
+		imgFree = BitmapFactory.decodeResource(this.resources, drawable.pto_free)
+		imgOccupied = BitmapFactory.decodeResource(this.resources, drawable.pto_occupied)
+		imgUnavailable = BitmapFactory.decodeResource(this.resources, drawable.pto_unavailable)
+		imgSelected = BitmapFactory.decodeResource(this.resources, drawable.pto_selected)
+		w = density / 420f * imgFree!!.width
+		h = density / 420f * imgFree!!.height
+		imgFree = Bitmap.createScaledBitmap(imgFree!!, w.toInt(), h.toInt(), true)
+		imgOccupied = Bitmap.createScaledBitmap(imgOccupied!!, w.toInt(), h.toInt(), true)
+		imgUnavailable = Bitmap.createScaledBitmap(imgUnavailable!!, w.toInt(), h.toInt(), true)
+		imgSelected = Bitmap.createScaledBitmap(imgSelected!!, w.toInt(), h.toInt(), true)
 
 		/// Camino
 		strokeWidth = (density / 60f).toInt()
 	}
+
 	//______________________________________________________________________________________________
 	override fun onReady() {
 		super.onReady()
 		setCamino(caminoOrg)
 	}
-
 	//______________________________________________________________________________________________
-	fun setIni(pto: PointF?) {
-		ptoIni = pto
-		invalidate()
-	}
-	//______________________________________________________________________________________________
-	fun setEnd(pto: PointF?) {
-		ptoEnd = pto
+	fun setPoint(init:Boolean, pto: PointF?){
+		if (init) ptoIni = pto
+		else {ptoEnd = pto}
 		invalidate()
 	}
 	//______________________________________________________________________________________________
@@ -95,11 +95,17 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 	}
 	//______________________________________________________________________________________________
 	fun setPuestos(puestos: List<Workstation>) {
-		this.puestos = puestos
-		for(puesto in puestos) {
+		this.puestos = List(puestos.size, { it ->
+			val coord: PointF = coord100ToImg(PointF(puestos[it].x, puestos[it].y))
+			puestos[it].createNewWithPosition(coord.x, coord.y)
+		})
+		invalidate()
+	}
+	//______________________________________________________________________________________________
+	fun setSeleccionado(puesto: Workstation?) {
+		if(puesto != null) {
 			val coord: PointF = coord100ToImg(PointF(puesto.x, puesto.y))
-			puesto.x = coord.x
-			puesto.y = coord.y
+			seleccionado = puesto.createNewWithPosition(coord.x, coord.y)
 		}
 		invalidate()
 	}
@@ -107,7 +113,6 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 	//______________________________________________________________________________________________
 	private fun coord100ToImg(pto: PointF): PointF {
 		if( ! isReady)return PointF(0f,0f)
-		//Log.e(TAG, "coord100ToImg:-----------"+isReady+"------"+sWidth+" / "+sHeight+" ::: "+pto.x+" :: "+imgIni!!.width)
 		val x = pto.x *sWidth/100f
 		val y = pto.y * sHeight/100f
 		return PointF(x, y)
@@ -123,40 +128,50 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 	private var preView = PointF()
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
-
 		if(!isReady) return
-
 		paint.isAntiAlias = true
 
 		/// PTO INICIO
-		drawIni(canvas)
+		draw(true,canvas)
 		/// PTO DESTINO
-		drawEnd(canvas)
+		draw(false,canvas)
 		/// CAMINO
 		drawCamino(canvas)
 		/// PUESTOS
 		drawPuestos(canvas)
+		/// SELECCIONADO
+		drawSeleccionado(canvas)
 	}
 	//______________________________________________________________________________________________
-	private fun drawIni(canvas: Canvas) {
-		if(ptoIni != null) {
-			sourceToViewCoord(ptoIni!!, ptoView)
-			//Log.e(TAG, "onDraw:ini:---------------------------src:"+ptoIni+" : view:"+ptoView)
-			val x = ptoView.x - imgIni!!.width / 2
-			val y = ptoView.y - imgIni!!.height
-			canvas.drawBitmap(imgIni!!, x, y, paint)
+	private fun draw(isInitial: Boolean, canvas: Canvas){
+		val pto: PointF
+		val img: Bitmap
+		if(isInitial){
+			if(ptoIni == null || imgIni == null){
+				//Log.e(TAG,"ERROR:INI: pto o img null: "+ptoIni+", "+imgIni)
+				return
+			}
+			pto = ptoIni!!
+			img = imgIni!!
+		}else {
+			if(ptoEnd == null || imgEnd == null){
+				//Log.e(TAG,"ERROR:END: pto o img null: "+ptoEnd+", "+imgEnd)
+				return
+			}
+			pto = ptoEnd!!
+			img = imgEnd!!
 		}
+		drawBitmap(pto, img, canvas)
 	}
+
 	//______________________________________________________________________________________________
-	private fun drawEnd(canvas: Canvas) {
-		if(ptoEnd != null) {
-			sourceToViewCoord(ptoEnd!!, ptoView)
-			//Log.e(TAG, "onDraw:end:---------------------------src:"+ptoEnd+" : view:"+ptoView)
-			val x = ptoView.x - imgEnd!!.width / 2
-			val y = ptoView.y - imgEnd!!.height
-			canvas.drawBitmap(imgEnd!!, x, y, paint)
-		}
+	private fun drawBitmap(pto: PointF, img: Bitmap, canvas: Canvas) {
+		sourceToViewCoord(pto, ptoView)
+		val x = ptoView.x - img.width / 2
+		val y = ptoView.y - img.height
+		canvas.drawBitmap(img, x, y, paint)
 	}
+
 	//______________________________________________________________________________________________
 	private fun drawCamino(canvas: Canvas) {
 		path.reset()
@@ -164,10 +179,8 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 			path.reset()
 			sourceToViewCoord(camino!![0].x, camino!![0].y, preView)
 			path.moveTo(preView.x, preView.y)
-			//Log.e(TAG, "onDraw:camino:-----------------------src:"+camino!![0]+" : view:"+preView)
 			for(i in 1 until camino!!.size) {
 				sourceToViewCoord(camino!![i].x, camino!![i].y, ptoView)
-				//Log.e(TAG, "camino:-----------------------src:"+camino!![i]+" : view:"+ptoView)
 				path.quadTo(preView.x, preView.y, (ptoView.x + preView.x) / 2, (ptoView.y + preView.y) / 2)
 				preView = ptoView
 			}
@@ -186,11 +199,25 @@ Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		if(puestos != null) {
 			for(puesto in puestos!!) {
 				sourceToViewCoord(PointF(puesto.x, puesto.y), ptoView)
-				val x = ptoView.x - imgLibre!!.width / 2
-				val y = ptoView.y - imgLibre!!.height /2
-				//TODO: esta libre u ocupado ????
-				canvas.drawBitmap(imgLibre!!, x, y, paint)
+				val img = when(puesto.status) {
+					Workstation.Status.Free -> imgFree!!
+					Workstation.Status.Occupied -> imgOccupied!!
+					Workstation.Status.Unavailable -> imgUnavailable!!
+				}
+				val x = ptoView.x - img.width / 2
+				val y = ptoView.y - img.height /2
+				canvas.drawBitmap(img, x, y, paint)
 			}
+		}
+	}
+	//______________________________________________________________________________________________
+	fun drawSeleccionado(canvas: Canvas) {
+		if(seleccionado != null) {
+			sourceToViewCoord(PointF(seleccionado!!.x, seleccionado!!.y), ptoView)
+			val img = imgSelected!!
+			val x = ptoView.x - img.width / 2
+			val y = ptoView.y - img.height /2
+			canvas.drawBitmap(img, x, y, paint)
 		}
 	}
 

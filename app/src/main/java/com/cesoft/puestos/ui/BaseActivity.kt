@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity
 import com.cesoft.puestos.App
 import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.data.auth.Auth
+import com.cesoft.puestos.data.fire.UserFire
+import com.cesoft.puestos.models.User
 import com.cesoft.puestos.ui.login.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 
@@ -40,6 +42,18 @@ abstract class BaseActivity: AppCompatActivity() {
 		}
 		else {
 			Log.e("BaseActivity", "onCreate:----------------------USR:"+auth.getEmail())
+			if((application as App).user == null) {
+				if(auth.getEmail() != null) {
+					UserFire.get((application as App).fire, auth.getEmail().toString(), { user: User, error ->
+						if(error == null) {
+							(application as App).user = user
+						}
+						else {
+							Log.e("BaseActivity", "onCreate:userFire.get:e:-------------------" + auth.getEmail().toString(), error)
+						}
+					})
+				}
+			}
 		}
 	}
 	//______________________________________________________________________________________________
