@@ -92,14 +92,14 @@ abstract class BaseActivity: AppCompatActivity() {
 						Log.e(TAG, "iniUserData:getByOwner:e:-------------------", error)
 					}
 				})
-				WorkstationFire.getByUser((application as App).fire, auth.getEmail().toString(), { ws: Workstation?, error ->
+				WorkstationFire.getByUserRT((application as App).fire, auth.getEmail().toString(), { ws: Workstation?, error ->
 					if(error == null) {
 						(application as App).wsUse = ws
 						onWorkstationUse(ws)
-						Log.e(TAG, "iniUserData:getByUser:-------------------"+ws)
+						Log.e(TAG, "iniUserData:getByUser:----------------------------------"+ws)
 					}
 					else {
-						Log.e(TAG, "iniUserData:getByUser:e:-------------------", error)
+						Log.e(TAG, "iniUserData:getByUser:e:---------------------------------", error)
 					}
 				})
 			}

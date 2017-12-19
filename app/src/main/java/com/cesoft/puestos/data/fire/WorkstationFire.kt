@@ -111,25 +111,56 @@ object WorkstationFire {
 					callback(null, task.exception)
 			})
 	}
+	//______________________________________________________________________________________________
+	// Find Workstation by User
+	fun getByUserRT(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
+		fire.getCol(ROOT_COLLECTION)
+			.whereEqualTo(FIELD_IDUSER, idUser)
+			//.get().addOnCompleteListener({ task: Task<QuerySnapshot> ->
+			.addSnapshotListener({ data: QuerySnapshot?, error: FirebaseFirestoreException? ->
+				if(error == null && data != null)  {
+					data.forEach { doc ->
+						val puesto = createPuestoHelper(fire, doc)
+						callback(puesto, null)
+						return@forEach
+					}
+				}
+				else
+					callback(null, error)
+		})
+	}
 
 	//______________________________________________________________________________________________
 	fun ocupar(fire: Fire, id: String, idUser: String) {
-		val puesto = fire.getCol(ROOT_COLLECTION).document(id)
 
+		val puesto = fire.getCol(ROOT_COLLECTION).document(id)
 		fire.runTransaction(Transaction.Function { transaction ->
-			val snapshot = transaction.get(puesto)
-			val status = snapshot.getString(FIELD_STATUS)!!
-			if(status == Workstation.Status.Free.name) {
-				transaction.update(puesto, FIELD_STATUS, Workstation.Status.Occupied.name)
-				transaction.update(puesto, FIELD_IDUSER, idUser)
-				Log.e(TAG, ">>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
-			}
-			else {
-				throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
-			}
-		})
-		.addOnSuccessListener(OnSuccessListener { result -> Log.e(TAG, "Transaction success: " + result!!) })
-		.addOnFailureListener(OnFailureListener { e -> Log.e(TAG, "Transaction failure.", e) })
+
+			// Comprobar que el usuario no tiene ocupado otro puesto
+			getByUser(fire, idUser, { elpuesto, error ->
+				if(error != null) {
+					Log.e(TAG, "ocupar:getByUser:e: -------------------------------------------"+puesto, error)
+				}
+				else if(elpuesto != null) {
+					Log.e(TAG, "ocupar:getByUser:e: El usuario ya ocupa otro puesto: " + elpuesto)
+				}
+				else {
+					val snapshot = transaction.get(puesto)
+					val status = snapshot.getString(FIELD_STATUS)!!
+					if(status == Workstation.Status.Free.name) {
+						transaction.update(puesto, FIELD_STATUS, Workstation.Status.Occupied.name)
+						transaction.update(puesto, FIELD_IDUSER, idUser)
+						Log.e(TAG, ">>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
+					}
+					else {
+						throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
+					}
+				}
+			})
+
+		})//TODO: mostrar al usuario
+		.addOnSuccessListener(OnSuccessListener { result -> Log.e(TAG, "Transaction success: *******************" + result!!) })
+		.addOnFailureListener(OnFailureListener { e -> Log.e(TAG, "Transaction failure. ***************", e) })
 	}
 
 	//______________________________________________________________________________________________

@@ -164,9 +164,9 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		paint.isAntiAlias = true
 
 		/// PTO INICIO
-		draw(true,canvas)
+		drawIni(canvas)
 		/// PTO DESTINO
-		draw(false,canvas)
+		drawEnd(canvas)
 		/// CAMINO
 		drawCamino(canvas)
 		/// PUESTOS
@@ -177,27 +177,15 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		drawWSOwn(canvas)
 	}
 	//______________________________________________________________________________________________
-	private fun draw(isInitial: Boolean, canvas: Canvas){
-		val pto: PointF
-		val img: Bitmap
-		if(isInitial){
-			if(ptoIni == null || imgIni == null){
-				//Log.e(TAG,"ERROR:INI: pto o img null: "+ptoIni+", "+imgIni)
-				return
-			}
-			pto = ptoIni!!
-			img = imgIni!!
-		}else {
-			if(ptoEnd == null || imgEnd == null){
-				//Log.e(TAG,"ERROR:END: pto o img null: "+ptoEnd+", "+imgEnd)
-				return
-			}
-			pto = ptoEnd!!
-			img = imgEnd!!
-		}
-		drawBitmap(pto, img, canvas)
+	private fun drawIni(canvas: Canvas){
+		if(ptoIni == null || imgIni == null)return
+		drawBitmap(ptoIni!!, imgIni!!, canvas)
 	}
-
+	//______________________________________________________________________________________________
+	private fun drawEnd(canvas: Canvas){
+		if(ptoEnd == null || imgEnd == null)return
+		drawBitmap(ptoEnd!!, imgEnd!!, canvas)
+	}
 	//______________________________________________________________________________________________
 	private fun drawBitmap(pto: PointF, img: Bitmap, canvas: Canvas) {
 		sourceToViewCoord(pto, ptoView)
@@ -238,7 +226,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 					Workstation.Status.Occupied -> imgOccupied!!
 					Workstation.Status.Unavailable -> imgUnavailable!!
 				}
-				val x = ptoView.x - img.width / 2
+				val x = ptoView.x - img.width /2
 				val y = ptoView.y - img.height /2
 				canvas.drawBitmap(img, x, y, paint)
 			}
@@ -249,8 +237,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		if(seleccionado != null) {
 			sourceToViewCoord(PointF(seleccionado!!.x, seleccionado!!.y), ptoView)
 			val img = imgSelected!!
-			val x = ptoView.x - img.width / 2
-			val y = ptoView.y - img.height / 2
+			val x = ptoView.x - img.width /2
+			val y = ptoView.y - img.height
 			canvas.drawBitmap(img, x, y, paint)
 		}
 	}
@@ -259,8 +247,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		if(wsOwn != null) {
 			sourceToViewCoord(PointF(wsOwn!!.x, wsOwn!!.y), ptoView)
 			val img = imgWSOwn!!
-			val x = ptoView.x - img.width  /2
-			val y = ptoView.y - img.height /2
+			val x = ptoView.x - img.width /2
+			val y = ptoView.y - img.height
 			canvas.drawBitmap(img, x, y, paint)
 		}
 	}
