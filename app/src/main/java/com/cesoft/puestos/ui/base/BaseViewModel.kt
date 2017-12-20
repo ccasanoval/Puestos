@@ -21,10 +21,6 @@ class BaseViewModel(app: Application) : AndroidViewModel(app) {
 
 	private var authListener: FirebaseAuth.AuthStateListener? = null
 
-	/*val user = getApplication<App>().user
-	val wsOwn = getApplication<App>().wsOwn
-	val wsUse = getApplication<App>().wsUse*/
-
 
 	//______________________________________________________________________________________________
 	fun onCreate(callback: (notLogedIn:Boolean)->Unit) {
@@ -66,17 +62,20 @@ class BaseViewModel(app: Application) : AndroidViewModel(app) {
 				WorkstationFire.getByOwnerRT(app.fire, auth.getEmail().toString(), { ws: Workstation?, error ->
 					if(error == null) {
 						app.wsOwn.value = ws
+						Log.e(TAG, "iniUserData:getByOwnerRT:-----***********--------------"+ws)
+
 					}
 					else {
-						Log.e(TAG, "iniUserData:getByOwner:e:-------------------", error)
+						Log.e(TAG, "iniUserData:getByOwnerRT:e:-------------------", error)
 					}
 				})
 				WorkstationFire.getByUserRT(app.fire, auth.getEmail().toString(), { ws: Workstation?, error ->
 					if(error == null) {
 						app.wsUse.value = ws
+						Log.e(TAG, "iniUserData:getByUserRT:-----***********--------------"+ws)
 					}
 					else {
-						Log.e(TAG, "iniUserData:getByUser:e:---------------------------------", error)
+						Log.e(TAG, "iniUserData:getByUserRT:e:---------------------------------", error)
 					}
 				})
 			}

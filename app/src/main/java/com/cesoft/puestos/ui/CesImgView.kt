@@ -90,6 +90,7 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		super.onReady()
 		setCamino(caminoOrg)
 		setWSOwn(wsOwn100)
+		setWSUse(wsOwn100)
 		if(puestos100 != null)
 			setPuestos(puestos100!!)
 	}
@@ -151,8 +152,10 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	fun setWSUse(puesto: Workstation?) {
 		if( ! isReady) {
 			wsUse100 = puesto
+			Log.e(TAG, "setWSUse:------0-------------------------------------------"+puesto)
 		}
 		else if(puesto != null) {
+			Log.e(TAG, "setWSUse:-------1------------------------------------------"+puesto)
 			val coord: PointF = coord100ToImg(PointF(puesto.x, puesto.y))
 			wsUse = puesto.createNewWithPosition(coord.x, coord.y)
 			wsUse100 = null

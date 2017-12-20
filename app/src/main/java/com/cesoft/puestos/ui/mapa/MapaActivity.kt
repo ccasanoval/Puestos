@@ -189,12 +189,12 @@ class MapaActivity : BaseActivity() {
 	}
 	//______________________________________________________________________________________________
 	private fun showWSOwn(puesto: Workstation?) {
-		Log.e(TAG, "showWSOwn-----------------")
+		Log.e(TAG, "showWSOwn------------******************************-----"+puesto)
 		imgPlano.setWSOwn(puesto)
 	}
 	//______________________________________________________________________________________________
 	private fun showWSUse(puesto: Workstation?) {
-		Log.e(TAG, "showWSUse-----------------"+puesto)
+		Log.e(TAG, "showWSUse---------------*****************************--"+puesto)
 		imgPlano.setWSUse(puesto)
 	}
 
