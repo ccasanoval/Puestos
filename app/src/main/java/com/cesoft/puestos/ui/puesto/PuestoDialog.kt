@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.Toast
 import com.cesoft.puestos.R
 import com.cesoft.puestos.data.parcelables.WorkstationParcelable
-import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.ui.dlg.SiNoDialog
 import com.cesoft.puestos.util.Log
@@ -37,13 +36,16 @@ class PuestoDialog : AppCompatActivity() {
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})
 		viewModel.user.observe(this, Observer { user ->
+			Log.e(TAG, "iniViewModel:user--------------------"+user)
 			setBotones()
 			setCampos()
 		})
-		viewModel.wsOwn.observe(this, Observer { puesto ->
+		viewModel.wsOwn.observe(this, Observer { pto ->
+			Log.e(TAG, "iniViewModel:own--------------------"+pto)
 			setBotones()
 		})
-		viewModel.wsOwn.observe(this, Observer { puesto ->
+		viewModel.wsUse.observe(this, Observer { pto ->
+			Log.e(TAG, "iniViewModel:use--------------------"+pto)
 			setBotones()
 		})
 	}
@@ -89,8 +91,7 @@ class PuestoDialog : AppCompatActivity() {
 		}
 		//txtName.focusable = View.NOT_FOCUSABLE
 		txtName.isEnabled = false
-		if(viewModel.user.value!!.type == User.Type.Admin
-				|| viewModel.user.value!!.id == viewModel.puesto!!.idOwner) {
+		if(viewModel.isAdmin || viewModel.isOwner) {
 			txtName.isEnabled = false
 		}
 	}
@@ -102,6 +103,7 @@ class PuestoDialog : AppCompatActivity() {
 		btnLiberar.visibility = View.GONE
 		btnGuardar.visibility = View.GONE
 		if(viewModel.puesto == null)return
+		Log.e(TAG, "setBotones------"+viewModel.isAdmin+"----------------"+viewModel.isOwner+"----------------------"+viewModel.puesto)
 
 		if(viewModel.isAdmin || viewModel.isOwner) {
 			btnGuardar.visibility = View.VISIBLE

@@ -119,6 +119,7 @@ object WorkstationFire {
 						callback(puesto, null)
 						return@forEach
 					}
+					callback(null, null)
 				}
 				else
 					callback(null, task.exception)
@@ -144,41 +145,46 @@ object WorkstationFire {
 
 	//______________________________________________________________________________________________
 	fun reserve(fire: Fire, id: String, idUser: String, callback: (Throwable?) -> Unit) {
+		Log.e(TAG, "reserve:-----------------------------1---------"+id+", "+idUser)
+
 		val puesto = fire.getCol(ROOT_COLLECTION).document(id)
-		fire.runTransaction(Transaction.Function { transaction ->
-			// Comprobar que el usuario no tiene ocupado otro puesto
-			getByUser(fire, idUser, { elpuesto, error ->
-				if(error != null) {
-					Log.e(TAG, "reserve:getByUser:e: -------------------------------------------"+puesto, error)
-					callback(error)
-				}
-				else if(elpuesto != null) {
-					Log.e(TAG, "reserve:getByUser:e: El usuario ya ocupa otro puesto: " + elpuesto)
-					callback(Exception("USER ALREADY OCCUPIES"))
-				}
-				else {
+
+		getByUser(fire, idUser, { elpuesto, error ->
+			if(error != null) {
+				Log.e(TAG, "reserve:getByUser:e: -------------------------------------------"+puesto, error)
+				callback(Exception())
+			}
+			else if(elpuesto != null) {
+				Log.e(TAG, "reserve:getByUser:e: ------------------------------- El usuario ya ocupa otro puesto: " + elpuesto)
+				callback(Exception())
+			}
+			else {
+				Log.e(TAG, "reserve:------------3--------------------------"+id+", "+idUser)
+				fire.runTransaction(Transaction.Function { transaction ->
+					Log.e(TAG, "reserve:-------------------------2-------------"+id+", "+idUser)
+
 					val snapshot = transaction.get(puesto)
 					val status = snapshot.getString(FIELD_STATUS)!!
 					if(status == Workstation.Status.Free.name) {
 						transaction.update(puesto, FIELD_STATUS, Workstation.Status.Occupied.name)
 						transaction.update(puesto, FIELD_IDUSER, idUser)
-						Log.e(TAG, "reserve------------>>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
+						Log.e(TAG, "reserve ok------------>>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
 					}
 					else {
-						Log.e(TAG, "ocupar:getByUser:e: -----------------------------------STAT: "+status)
-						throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
+						Log.e(TAG, "reserve:getByUser:e: -----------------------------------STAT: "+status)
+						throw FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
 					}
-				}
-			})
+				})
+				.addOnSuccessListener {	callback(null) }
+				.addOnFailureListener {	error -> callback(error) }
+			}
 		})
-		.addOnSuccessListener { callback(null) }
-		.addOnFailureListener { error -> callback(error) }
 	}
 
 	//______________________________________________________________________________________________
 	fun vacate(fire: Fire, id: String, callback: (Throwable?) -> Unit) {
 		val puesto = fire.getCol(ROOT_COLLECTION).document(id)
-		Log.e(TAG, "vacate:------------------------------------------------------"+puesto.id)
+		Log.e(TAG, "vacate:--------------------0----------------------------------"+puesto.id)
 
 		fire.runTransaction(Transaction.Function { transaction ->
 			val snapshot = transaction.get(puesto)

@@ -13,7 +13,7 @@ import com.cesoft.puestos.R
 import com.cesoft.puestos.data.parcelables.WorkstationParcelable
 import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
-import com.cesoft.puestos.ui.BaseActivity
+import com.cesoft.puestos.ui.base.BaseActivity
 import com.cesoft.puestos.ui.dlg.SiNoDialog
 import com.cesoft.puestos.ui.puesto.PuestoDialog
 import com.davemorrissey.labs.subscaleview.ImageSource
@@ -59,8 +59,9 @@ class MapaActivity : BaseActivity() {
 		viewModel.mensaje.observe(this, Observer { mensaje ->
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})
-		viewModel.user.observe(this, Observer { usr: User? ->
-			Log.e(TAG, "iniViewModel:-----------------------USER-----------------------"+usr)
+		viewModel.user.observe(this, Observer { user: User? ->
+			onUser(user!!)
+			Log.e(TAG, "iniViewModel:-----------------------USER-----------------------"+user)
 		})
 		viewModel.camino.observe(this, Observer<Array<PointF>> { camino ->
 			if(camino == null)	delCamino()
@@ -84,11 +85,19 @@ class MapaActivity : BaseActivity() {
 				viewModel.selected.value = null
 			}
 		})
-		viewModel.wsOwn.observe(this, Observer<Workstation> { pto ->
+		viewModel.wsOwn.observe(this, Observer<Workstation> { pto ->//TODO: cambiar color icono OWN
+			Log.e(TAG, "iniViewModel:-----------------------wsOwn-----------------------"+pto)
 			showWSOwn(pto)
+		})
+		viewModel.wsUse.observe(this, Observer<Workstation> { pto ->
+			Log.e(TAG, "iniViewModel:-----------------------wsUse-----------------------"+pto)
+			showWSUse(pto)
 		})
 		viewModel.ini.observe(this, Observer<PointF>{ pto -> showPointF(true,pto) })
 		viewModel.end.observe(this, Observer<PointF>{ pto -> showPointF(false,pto) })
+
+		Log.e(TAG, "iniViewModel:-----------------------fin-----------------------")
+
 	}
 
 	//______________________________________________________________________________________________
@@ -180,18 +189,17 @@ class MapaActivity : BaseActivity() {
 	}
 	//______________________________________________________________________________________________
 	private fun showWSOwn(puesto: Workstation?) {
+		Log.e(TAG, "showWSOwn-----------------")
 		imgPlano.setWSOwn(puesto)
+	}
+	//______________________________________________________________________________________________
+	private fun showWSUse(puesto: Workstation?) {
+		Log.e(TAG, "showWSUse-----------------"+puesto)
+		imgPlano.setWSUse(puesto)
 	}
 
 	//______________________________________________________________________________________________
-	override fun onUser(user: User) {
-		//if(user != null)
-		/*viewModel.usuario.value = user.name + " : " +
-			when(user.type) {
-				User.Type.Admin -> getString(R.string.admin)
-				User.Type.Fixed -> getString(R.string.fixed)
-				User.Type.Interim -> getString(R.string.interim)
-			}*/
+	fun onUser(user: User) {
 		setTitulo(user.name + " : " +
 			when(user.type) {
 				User.Type.Admin -> getString(R.string.admin)
@@ -199,15 +207,6 @@ class MapaActivity : BaseActivity() {
 				User.Type.Interim -> getString(R.string.interim)
 			})
 	}
-	//______________________________________________________________________________________________
-	override fun onWorkstationOwn(wsOwn: Workstation?) {
-		viewModel.wsOwn.value = wsOwn
-	}
-	//______________________________________________________________________________________________
-	override fun onWorkstationUse(wsUse: Workstation?) {
-		viewModel.wsOwn.value = wsUse
-	}
-
 
 	//______________________________________________________________________________________________
 	companion object {

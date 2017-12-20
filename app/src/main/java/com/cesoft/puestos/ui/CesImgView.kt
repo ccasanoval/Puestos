@@ -40,6 +40,9 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var imgWSOwn: Bitmap? = null
 	private var wsOwn: Workstation? = null
 	private var wsOwn100: Workstation? = null
+	private var imgWSUse: Bitmap? = null
+	private var wsUse: Workstation? = null
+	private var wsUse100: Workstation? = null
 
 
 	//______________________________________________________________________________________________
@@ -50,8 +53,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		val density = resources.displayMetrics.densityDpi.toFloat()
 
 		/// Desde Hasta
-		imgIni = BitmapFactory.decodeResource(this.resources, drawable.rute_ini)
-		imgEnd = BitmapFactory.decodeResource(this.resources, drawable.rute_end)
+		imgIni = BitmapFactory.decodeResource(resources, drawable.rute_ini)
+		imgEnd = BitmapFactory.decodeResource(resources, drawable.rute_end)
 		Log.e(TAG, "init:-------------------"+density+" : "+(420f/density))
 		var w = density / 420f * imgIni!!.width
 		var h = density / 420f * imgIni!!.height
@@ -59,10 +62,10 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		imgEnd = Bitmap.createScaledBitmap(imgEnd!!, w.toInt(), h.toInt(), true)
 
 		/// Libre Ocupado
-		imgFree = BitmapFactory.decodeResource(this.resources, drawable.pto_free)
-		imgOccupied = BitmapFactory.decodeResource(this.resources, drawable.pto_occupied)
-		imgUnavailable = BitmapFactory.decodeResource(this.resources, drawable.pto_unavailable)
-		imgSelected = BitmapFactory.decodeResource(this.resources, drawable.pto_selected)
+		imgFree = BitmapFactory.decodeResource(resources, drawable.pto_free)
+		imgOccupied = BitmapFactory.decodeResource(resources, drawable.pto_occupied)
+		imgUnavailable = BitmapFactory.decodeResource(resources, drawable.pto_unavailable)
+		imgSelected = BitmapFactory.decodeResource(resources, drawable.pto_selected)
 		w = density / 420f * imgFree!!.width
 		h = density / 420f * imgFree!!.height
 		imgFree = Bitmap.createScaledBitmap(imgFree!!, w.toInt(), h.toInt(), true)
@@ -71,10 +74,12 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		imgSelected = Bitmap.createScaledBitmap(imgSelected!!, w.toInt(), h.toInt(), true)
 
 		/// Home
-		imgWSOwn = BitmapFactory.decodeResource(this.resources, drawable.pto_home)
+		imgWSOwn = BitmapFactory.decodeResource(resources, drawable.pto_home)
+		imgWSUse = BitmapFactory.decodeResource(resources, drawable.pto_home)
 		w = density / 720f * imgWSOwn!!.width
 		h = density / 720f * imgWSOwn!!.height
 		imgWSOwn = Bitmap.createScaledBitmap(imgWSOwn!!, w.toInt(), h.toInt(), true)
+		imgWSUse = Bitmap.createScaledBitmap(imgWSUse!!, w.toInt(), h.toInt(), true)
 
 		/// Camino
 		strokeWidth = (density / 60f).toInt()
@@ -142,6 +147,18 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		}
 		invalidate()
 	}
+	//______________________________________________________________________________________________
+	fun setWSUse(puesto: Workstation?) {
+		if( ! isReady) {
+			wsUse100 = puesto
+		}
+		else if(puesto != null) {
+			val coord: PointF = coord100ToImg(PointF(puesto.x, puesto.y))
+			wsUse = puesto.createNewWithPosition(coord.x, coord.y)
+			wsUse100 = null
+		}
+		invalidate()
+	}
 
 	//______________________________________________________________________________________________
 	private fun coord100ToImg(pto: PointF): PointF {
@@ -173,8 +190,9 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		drawPuestos(canvas)
 		/// SELECCIONADO
 		drawSeleccionado(canvas)
-		/// HOME
+		/// USING & OWNNING
 		drawWSOwn(canvas)
+		drawWSUse(canvas)
 	}
 	//______________________________________________________________________________________________
 	private fun drawIni(canvas: Canvas){
@@ -247,6 +265,16 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		if(wsOwn != null) {
 			sourceToViewCoord(PointF(wsOwn!!.x, wsOwn!!.y), ptoView)
 			val img = imgWSOwn!!
+			val x = ptoView.x - img.width /2
+			val y = ptoView.y - img.height
+			canvas.drawBitmap(img, x, y, paint)
+		}
+	}
+	//______________________________________________________________________________________________
+	fun drawWSUse(canvas: Canvas) {
+		if(wsUse != null) {
+			sourceToViewCoord(PointF(wsUse!!.x, wsUse!!.y), ptoView)
+			val img = imgWSUse!!
 			val x = ptoView.x - img.width /2
 			val y = ptoView.y - img.height
 			canvas.drawBitmap(img, x, y, paint)

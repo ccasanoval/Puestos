@@ -27,11 +27,12 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	private val auth: Auth = getApplication<App>().auth
 	private val fire: Fire = getApplication<App>().fire
 	val user: MutableLiveData<User> = getApplication<App>().user
+	val wsOwn: MutableLiveData<Workstation> = getApplication<App>().wsOwn
+	val wsUse: MutableLiveData<Workstation> = getApplication<App>().wsUse
 
 	val mensaje = MutableLiveData<String>()
 	val puestos = MutableLiveData<List<Workstation>>()
 	val selected = MutableLiveData<Workstation>()
-	val wsOwn = MutableLiveData<Workstation>()
 	val camino = MutableLiveData<Array<PointF>>()
 	val ini = MutableLiveData<PointF>()
 	val end = MutableLiveData<PointF>()
