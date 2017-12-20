@@ -59,8 +59,12 @@ class MapaActivity : BaseActivity() {
 		viewModel.mensaje.observe(this, Observer { mensaje ->
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})
-		viewModel.usuario.observe(this, Observer<String> { usuario ->
+		/*viewModel.usuario.observe(this, Observer<String> { usuario ->
+			Log.e(TAG, "iniViewModel:---------------------------A---------------------------------"+usuario)
 			setTitulo(usuario)
+		})*/
+		viewModel.user.observe(this, Observer { usr ->
+			Log.e(TAG, "iniViewModel:---------------------------A---------------------------------"+usr)
 		})
 		viewModel.camino.observe(this, Observer<Array<PointF>> { camino ->
 			if(camino == null)	delCamino()
@@ -188,7 +192,18 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	override fun onUser(user: User) {
 		//if(user != null)
-		viewModel.usuario.value = user.name + " : " + user.type
+		/*viewModel.usuario.value = user.name + " : " +
+			when(user.type) {
+				User.Type.Admin -> getString(R.string.admin)
+				User.Type.Fixed -> getString(R.string.fixed)
+				User.Type.Interim -> getString(R.string.interim)
+			}*/
+		setTitulo(user.name + " : " +
+			when(user.type) {
+				User.Type.Admin -> getString(R.string.admin)
+				User.Type.Fixed -> getString(R.string.fixed)
+				User.Type.Interim -> getString(R.string.interim)
+			})
 	}
 	//______________________________________________________________________________________________
 	override fun onWorkstationOwn(wsOwn: Workstation?) {

@@ -15,7 +15,7 @@ import com.cesoft.puestos.models.Workstation
 class PuestoViewModel(app: Application) : AndroidViewModel(app) {
 
 	private val fire: Fire = getApplication<App>().fire
-	val user: User = getApplication<App>().user!!
+	val user: User = getApplication<App>().userRT.value!!
 	var puesto: Workstation? = null
 	var isDirty: Boolean = false
 

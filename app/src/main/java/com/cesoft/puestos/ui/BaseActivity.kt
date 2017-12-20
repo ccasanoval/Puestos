@@ -67,13 +67,13 @@ abstract class BaseActivity: AppCompatActivity() {
 	//______________________________________________________________________________________________
 	private fun iniUserData(auth: Auth) {
 		//Log.e(TAG, "iniUserData:---------------------USR:" + (application as App).user)
-		if((application as App).user == null) {
+		if((application as App).userRT.value == null) {
 			//Log.e(TAG, "iniUserData:-------------------EMAIL: " + auth.getEmail())
 			if(auth.getEmail() != null) {
 				// USR
-				UserFire.get((application as App).fire, auth.getEmail().toString(), { user: User, error ->
+				UserFire.getRT((application as App).fire, auth.getEmail().toString(), { user: User, error ->
 					if(error == null) {
-						(application as App).user = user
+						(application as App).userRT.value = user
 						onUser(user)
 						Log.e(TAG, "iniUserData:userFire.get:-------------------" + auth.getEmail().toString())
 					}

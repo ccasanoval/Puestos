@@ -47,9 +47,9 @@
     <string name="free">Libre</string>
     <string name="unavailable">No disponible</string>
     <!-- ENUM: USER TYPE -->
-    <string name="admin">Administrador</string>
-    <string name="fixed">Trabajador fijo</string>
-    <string name="interim">Trabajador temporal</string>
+    <string name="admin">Admin</string>
+    <string name="fixed">Fijo</string>
+    <string name="interim">Temporal</string>
     <string name="manage_own_workstation">Gestionar puesto propio</string>
 
 </resources>

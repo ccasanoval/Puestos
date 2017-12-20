@@ -28,7 +28,7 @@ class PuestoDialog : AppCompatActivity() {
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})*/
 
-		val parcel: WorkstationParcelable = intent.extras.getParcelable(Workstation::class.java.name)
+		val parcel: WorkstationParcelable? = intent.extras.getParcelable(Workstation::class.java.name)
 		if(parcel != null)viewModel.puesto = parcel.puesto
 
 		iniBotones()
