@@ -50,12 +50,30 @@ class PuestoViewModel(app: Application) : AndroidViewModel(app) {
 	//______________________________________________________________________________________________
 	fun liberar() {
 		if(puesto == null)return
-		WorkstationFire.liberar(fire, puesto!!.id, user.value!!.id)
+		WorkstationFire.vacate(fire, puesto!!.id, { error ->
+			if(error == null) {
+				mensaje.value = getApplication<App>().getString(R.string.puesto_vacant_ok)
+				Log.e(TAG, "liberar:------------------OK-----------------------"+mensaje.value)
+
+			}
+			else {
+				Log.e(TAG, "liberar:e:------------------------------------------------------",error)
+				mensaje.value = getApplication<App>().getString(R.string.puesto_vacant_error)
+			}
+		})
 	}
 	//______________________________________________________________________________________________
-	fun guardar() {
-		if(puesto == null)return
-		WorkstationFire.guardar(fire, puesto!!.id, user.value!!.id)
+	fun guardar(name: String) {
+		if(puesto == null || name.isEmpty())return
+		WorkstationFire.guardar(fire, puesto!!.id, name, { error ->
+			if(error == null) {
+				mensaje.value = getApplication<App>().getString(R.string.save_data_ok)
+			}
+			else {
+				Log.e(TAG, "guardar:e:---------------------------------------------------------",error)
+				mensaje.value = getApplication<App>().getString(R.string.save_data_error)
+			}
+		})
 	}
 
 	companion object {

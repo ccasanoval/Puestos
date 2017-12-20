@@ -53,5 +53,9 @@
     <string name="manage_own_workstation">Gestionar puesto propio</string>
     <string name="puesto_reserve_ok">Puesto reservado correctamente</string>
     <string name="puesto_reserve_error">No pudo reservarse el puesto</string>
+    <string name="puesto_vacant_ok">Puesto liberado correctamente</string>
+    <string name="puesto_vacant_error">No pudo liberarse el puesto</string>
+    <string name="save_data_ok">Se guardaron los datos</string>
+    <string name="save_data_error">Se produjo un error al guardar los datos</string>
 
 </resources>

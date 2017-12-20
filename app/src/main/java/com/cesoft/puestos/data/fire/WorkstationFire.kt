@@ -2,10 +2,10 @@ package com.cesoft.puestos.data.fire
 
 import com.cesoft.puestos.models.Workstation
 import com.cesoft.puestos.util.Log
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import com.cesoft.puestos.models.User
+
 
 
 /**
@@ -51,7 +51,7 @@ object WorkstationFire {
 				val res = arrayListOf<Workstation>()
 				if(error == null && data != null) {
 					data.forEach { doc ->
-						val puesto = createPuestoHelper(fire, doc)
+						val puesto = createHelper(fire, doc)
 						if(puesto != null) res.add(puesto)
 					}
 					callback(res, null)
@@ -63,7 +63,7 @@ object WorkstationFire {
 			})
 	}
 	//______________________________________________________________________________________________
-	fun createPuestoHelper(fire: Fire, doc: DocumentSnapshot): Workstation? {
+	fun createHelper(fire: Fire, doc: DocumentSnapshot): Workstation? {
 		val puesto = fire.translate(doc, Workstation::class.java) as Workstation?
 		if(puesto != null) {
 			val pos: GeoPoint = doc.get(POSITION_FIELD) as GeoPoint
@@ -98,7 +98,7 @@ object WorkstationFire {
 			.addSnapshotListener({ data: QuerySnapshot?, error: FirebaseFirestoreException? ->
 				if(error == null && data != null)  {
 					data.forEach { doc ->
-						val puesto = createPuestoHelper(fire, doc)
+						val puesto = createHelper(fire, doc)
 						callback(puesto, null)
 						return@forEach
 					}
@@ -115,7 +115,7 @@ object WorkstationFire {
 			.get().addOnCompleteListener({ task: Task<QuerySnapshot> ->
 				if(task.isSuccessful)  {
 					task.result.forEach { doc ->
-						val puesto = createPuestoHelper(fire, doc)
+						val puesto = createHelper(fire, doc)
 						callback(puesto, null)
 						return@forEach
 					}
@@ -132,7 +132,7 @@ object WorkstationFire {
 			.addSnapshotListener({ data: QuerySnapshot?, error: FirebaseFirestoreException? ->
 				if(error == null && data != null)  {
 					data.forEach { doc ->
-						val puesto = createPuestoHelper(fire, doc)
+						val puesto = createHelper(fire, doc)
 						callback(puesto, null)
 						return@forEach
 					}
@@ -163,26 +163,44 @@ object WorkstationFire {
 						transaction.update(puesto, FIELD_STATUS, Workstation.Status.Occupied.name)
 						transaction.update(puesto, FIELD_IDUSER, idUser)
 						Log.e(TAG, "reserve------------>>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
-						callback(null)
 					}
 					else {
-						callback(Exception("UNAVAILABLE"))
 						Log.e(TAG, "ocupar:getByUser:e: -----------------------------------STAT: "+status)
-						//throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
+						throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
 					}
 				}
 			})
 		})
-		//.addOnSuccessListener(OnSuccessListener { result -> Log.e(TAG, "Transaction success: *******************" + result!!) })
-		//.addOnFailureListener(OnFailureListener { e -> Log.e(TAG, "Transaction failure. ***************", e) })
+		.addOnSuccessListener { callback(null) }
+		.addOnFailureListener { error -> callback(error) }
 	}
 
 	//______________________________________________________________________________________________
-	fun liberar(fire: Fire, id: String, idUser: String) {
+	fun vacate(fire: Fire, id: String, callback: (Throwable?) -> Unit) {
+		val puesto = fire.getCol(ROOT_COLLECTION).document(id)
+		Log.e(TAG, "vacate:------------------------------------------------------"+puesto.id)
 
+		fire.runTransaction(Transaction.Function { transaction ->
+			val snapshot = transaction.get(puesto)
+			val status = snapshot.getString(FIELD_STATUS)!!
+			//val idUserAct = snapshot.getString(FIELD_IDUSER)!!
+			if(status == Workstation.Status.Occupied.name) {// && idUser == idUserAct) {
+				transaction.update(puesto, FIELD_STATUS, Workstation.Status.Free.name)
+				transaction.update(puesto, FIELD_IDUSER, User.NONE)
+			}
+			else {
+				Log.e(TAG, "vacate:getByUser:e: -----------------------------------STAT: "+status)
+				throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
+			}
+		})
+		.addOnSuccessListener { callback(null) }
+		.addOnFailureListener { error -> callback(error) }
 	}
 	//______________________________________________________________________________________________
-	fun guardar(fire: Fire, id: String, idUser: String) {
-
+	fun guardar(fire: Fire, id: String, name: String, callback: (Throwable?) -> Unit) {
+		fire.getCol(ROOT_COLLECTION).document(id)
+			.update(FIELD_NAME, name)
+			.addOnSuccessListener({ callback(null) })
+			.addOnFailureListener({ error -> callback(error)})
 	}
 }

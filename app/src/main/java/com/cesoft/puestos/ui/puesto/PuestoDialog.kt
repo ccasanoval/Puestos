@@ -102,7 +102,6 @@ class PuestoDialog : AppCompatActivity() {
 		btnLiberar.visibility = View.GONE
 		btnGuardar.visibility = View.GONE
 		if(viewModel.puesto == null)return
-		Log.e(TAG, "setBotones:-------------------"+(viewModel.user.value?.id +"++"+ viewModel.puesto?.idUser)+"------------------------USER:"+viewModel.isUser)
 
 		if(viewModel.isAdmin || viewModel.isOwner) {
 			btnGuardar.visibility = View.VISIBLE
@@ -135,7 +134,7 @@ class PuestoDialog : AppCompatActivity() {
 	}
 	//______________________________________________________________________________________________
 	private fun guardar() {
-		viewModel.guardar()
+		viewModel.guardar(txtName.text.toString())
 	}
 	//______________________________________________________________________________________________
 	private fun salir() {

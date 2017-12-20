@@ -59,10 +59,6 @@ class MapaActivity : BaseActivity() {
 		viewModel.mensaje.observe(this, Observer { mensaje ->
 			Toast.makeText(applicationContext, mensaje, Toast.LENGTH_LONG).show()
 		})
-		/*viewModel.usuario.observe(this, Observer<String> { usuario ->
-			Log.e(TAG, "iniViewModel:---------------------------A---------------------------------"+usuario)
-			setTitulo(usuario)
-		})*/
 		viewModel.user.observe(this, Observer { usr: User? ->
 			Log.e(TAG, "iniViewModel:-----------------------USER-----------------------"+usr)
 		})
@@ -126,7 +122,6 @@ class MapaActivity : BaseActivity() {
 				Toast.makeText(this@MapaActivity, getString(R.string.puestos_msg), Toast.LENGTH_SHORT).show()
 			}
 			R.id.act_logout -> {
-				Log.e(TAG, "onOptionsItemSelected:action_logout:----------------------------------------------")
 				SiNoDialog.show(this,
 						getString(R.string.seguro_logout),
 						{ si -> if(si) viewModel.logout() })
@@ -171,7 +166,6 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	private fun showPuestos(puestos: List<Workstation>) {
 		if(puestos.isNotEmpty())
-		Log.e(TAG, "showPuestos : ----------x="+puestos[0].x)
 		imgPlano.setPuestos(puestos)
 	}
 
