@@ -11,4 +11,7 @@ data class User(
 {
 	enum class Type(name: String) { Admin("Admin"), Fixed("Fixed"), Interim("Interim") }
 	fun copy(id: String) = User(id, name, type)
+	companion object {
+		val NONE: String = ""
+	}
 }

@@ -26,7 +26,7 @@ object WorkstationFire {
 	private val FIELD_STATUS = "status"
 
 	//______________________________________________________________________________________________
-	fun getAll(fire: Fire, callback: (ArrayList<Workstation>, Throwable?) -> Unit) {
+	/*fun getAll(fire: Fire, callback: (ArrayList<Workstation>, Throwable?) -> Unit) {
 		fire.getCol(ROOT_COLLECTION)
 			.get()
 			.addOnCompleteListener({ task ->
@@ -43,7 +43,7 @@ object WorkstationFire {
 					Log.e(TAG, "getAll:e:------------------------------------------------------", task.exception)
 				}
 			})
-	}
+	}*/
 	//______________________________________________________________________________________________
 	fun getAllRT(fire: Fire, callback: (ArrayList<Workstation>, Throwable?) -> Unit) {
 		fire.getCol(ROOT_COLLECTION)
@@ -73,24 +73,38 @@ object WorkstationFire {
 	}
 
 	//______________________________________________________________________________________________
-	// Find Workstation by User or Owner
-	fun getByOwner(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
+	// Find Workstation by Owner
+	/*fun getByOwnerOnlyRT(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
 		fire.getCol(ROOT_COLLECTION)
 			.whereEqualTo(FIELD_IDOWNER, idUser)
 			.whereEqualTo(FIELD_IDUSER, "")
-			.get()
-			.addOnCompleteListener({ task: Task<QuerySnapshot> ->
-				if(task.isSuccessful) {
-					Log.e(TAG, "getByOwner:----------------------------------------------------")
-
-					task.result.forEach { doc ->
+			.addSnapshotListener({ data: QuerySnapshot?, error: FirebaseFirestoreException? ->
+				if(error == null && data != null)  {
+					data.forEach { doc ->
 						val puesto = createPuestoHelper(fire, doc)
 						callback(puesto, null)
 						return@forEach
 					}
 				}
 				else
-					callback(null, task.exception)
+					callback(null, error)
+			})
+	}*/
+	//______________________________________________________________________________________________
+	// Find Workstation by Owner
+	fun getByOwnerRT(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
+		fire.getCol(ROOT_COLLECTION)
+			.whereEqualTo(FIELD_IDOWNER, idUser)
+			.addSnapshotListener({ data: QuerySnapshot?, error: FirebaseFirestoreException? ->
+				if(error == null && data != null)  {
+					data.forEach { doc ->
+						val puesto = createPuestoHelper(fire, doc)
+						callback(puesto, null)
+						return@forEach
+					}
+				}
+				else
+					callback(null, error)
 			})
 	}
 	//______________________________________________________________________________________________
@@ -98,8 +112,7 @@ object WorkstationFire {
 	fun getByUser(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
 		fire.getCol(ROOT_COLLECTION)
 			.whereEqualTo(FIELD_IDUSER, idUser)
-			.get()
-			.addOnCompleteListener({ task: Task<QuerySnapshot> ->
+			.get().addOnCompleteListener({ task: Task<QuerySnapshot> ->
 				if(task.isSuccessful)  {
 					task.result.forEach { doc ->
 						val puesto = createPuestoHelper(fire, doc)
@@ -116,7 +129,6 @@ object WorkstationFire {
 	fun getByUserRT(fire: Fire, idUser: String, callback: (Workstation?, Throwable?) -> Unit) {
 		fire.getCol(ROOT_COLLECTION)
 			.whereEqualTo(FIELD_IDUSER, idUser)
-			//.get().addOnCompleteListener({ task: Task<QuerySnapshot> ->
 			.addSnapshotListener({ data: QuerySnapshot?, error: FirebaseFirestoreException? ->
 				if(error == null && data != null)  {
 					data.forEach { doc ->
@@ -131,18 +143,18 @@ object WorkstationFire {
 	}
 
 	//______________________________________________________________________________________________
-	fun ocupar(fire: Fire, id: String, idUser: String) {
-
+	fun reserve(fire: Fire, id: String, idUser: String, callback: (Throwable?) -> Unit) {
 		val puesto = fire.getCol(ROOT_COLLECTION).document(id)
 		fire.runTransaction(Transaction.Function { transaction ->
-
 			// Comprobar que el usuario no tiene ocupado otro puesto
 			getByUser(fire, idUser, { elpuesto, error ->
 				if(error != null) {
-					Log.e(TAG, "ocupar:getByUser:e: -------------------------------------------"+puesto, error)
+					Log.e(TAG, "reserve:getByUser:e: -------------------------------------------"+puesto, error)
+					callback(error)
 				}
 				else if(elpuesto != null) {
-					Log.e(TAG, "ocupar:getByUser:e: El usuario ya ocupa otro puesto: " + elpuesto)
+					Log.e(TAG, "reserve:getByUser:e: El usuario ya ocupa otro puesto: " + elpuesto)
+					callback(Exception("USER ALREADY OCCUPIES"))
 				}
 				else {
 					val snapshot = transaction.get(puesto)
@@ -150,17 +162,19 @@ object WorkstationFire {
 					if(status == Workstation.Status.Free.name) {
 						transaction.update(puesto, FIELD_STATUS, Workstation.Status.Occupied.name)
 						transaction.update(puesto, FIELD_IDUSER, idUser)
-						Log.e(TAG, ">>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
+						Log.e(TAG, "reserve------------>>"+FIELD_STATUS+"="+Workstation.Status.Occupied.name+" BY "+FIELD_IDUSER+":"+idUser)
+						callback(null)
 					}
 					else {
-						throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
+						callback(Exception("UNAVAILABLE"))
+						Log.e(TAG, "ocupar:getByUser:e: -----------------------------------STAT: "+status)
+						//throw FirebaseFirestoreException("ocupar: ID "+id+", Status "+status, FirebaseFirestoreException.Code.ABORTED)
 					}
 				}
 			})
-
-		})//TODO: mostrar al usuario
-		.addOnSuccessListener(OnSuccessListener { result -> Log.e(TAG, "Transaction success: *******************" + result!!) })
-		.addOnFailureListener(OnFailureListener { e -> Log.e(TAG, "Transaction failure. ***************", e) })
+		})
+		//.addOnSuccessListener(OnSuccessListener { result -> Log.e(TAG, "Transaction success: *******************" + result!!) })
+		//.addOnFailureListener(OnFailureListener { e -> Log.e(TAG, "Transaction failure. ***************", e) })
 	}
 
 	//______________________________________________________________________________________________

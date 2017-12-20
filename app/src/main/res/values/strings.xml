@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Puestos</string>
+    <string name="app_name">CES Puestos</string>
     <string name="app_title">Administrador de Puestos</string>
     <string name="cargando_imagen">La imagen aun se está cargando…</string>
     <string name="sesion_cerrada">Inicia tu sesión</string>
@@ -51,5 +51,7 @@
     <string name="fixed">Fijo</string>
     <string name="interim">Temporal</string>
     <string name="manage_own_workstation">Gestionar puesto propio</string>
+    <string name="puesto_reserve_ok">Puesto reservado correctamente</string>
+    <string name="puesto_reserve_error">No pudo reservarse el puesto</string>
 
 </resources>

@@ -20,8 +20,8 @@
         <activity
             android:name=".ui.puesto.PuestoDialog"
             android:screenOrientation="portrait"
-            android:excludeFromRecents="true" />
-            <!-- android:theme="@style/Theme.AppCompat.Dialog"/ -->
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.AppCompat.Dialog" />
     </application>
 
 </manifest>

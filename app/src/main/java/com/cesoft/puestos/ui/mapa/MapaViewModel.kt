@@ -3,7 +3,6 @@ package com.cesoft.puestos.ui.mapa
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
 import android.graphics.PointF
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -15,8 +14,8 @@ import com.cesoft.puestos.R
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.data.fire.WorkstationFire
-import com.cesoft.puestos.util.Plane
 import com.cesoft.puestos.models.User
+import com.cesoft.puestos.util.Plane
 import com.cesoft.puestos.models.Workstation
 
 
@@ -27,7 +26,7 @@ import com.cesoft.puestos.models.Workstation
 class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	private val auth: Auth = getApplication<App>().auth
 	private val fire: Fire = getApplication<App>().fire
-	val user = getApplication<App>().userRT
+	val user: MutableLiveData<User> = getApplication<App>().user
 
 	val mensaje = MutableLiveData<String>()
 	//val usuario = MutableLiveData<String>()

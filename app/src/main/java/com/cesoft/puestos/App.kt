@@ -43,10 +43,11 @@ class App : Application() {
 	lateinit var auth: Auth
 	lateinit var fire: Fire
 	//var user: User? = null
-	var wsOwn: Workstation? = null
-	var wsUse: Workstation? = null
-
-	val userRT = MutableLiveData<User>()
+	//var wsOwn: Workstation? = null
+	//var wsUse: Workstation? = null
+	val user = MutableLiveData<User>()
+	val wsOwn = MutableLiveData<Workstation>()
+	val wsUse = MutableLiveData<Workstation>()
 
 	//______________________________________________________________________________________________
 	override fun onCreate() {

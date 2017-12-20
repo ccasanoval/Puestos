@@ -66,27 +66,23 @@ abstract class BaseActivity: AppCompatActivity() {
 
 	//______________________________________________________________________________________________
 	private fun iniUserData(auth: Auth) {
-		//Log.e(TAG, "iniUserData:---------------------USR:" + (application as App).user)
-		if((application as App).userRT.value == null) {
-			//Log.e(TAG, "iniUserData:-------------------EMAIL: " + auth.getEmail())
+		if((application as App).user.value == null) {
 			if(auth.getEmail() != null) {
 				// USR
 				UserFire.getRT((application as App).fire, auth.getEmail().toString(), { user: User, error ->
 					if(error == null) {
-						(application as App).userRT.value = user
+						(application as App).user.value = user
 						onUser(user)
-						Log.e(TAG, "iniUserData:userFire.get:-------------------" + auth.getEmail().toString())
 					}
 					else {
 						Log.e(TAG, "iniUserData:userFire.get:e:-------------------" + auth.getEmail().toString(), error)
 					}
 				})
 				// WORKSTATIONS
-				WorkstationFire.getByOwner((application as App).fire, auth.getEmail().toString(), { ws: Workstation?, error ->
+				WorkstationFire.getByOwnerRT((application as App).fire, auth.getEmail().toString(), { ws: Workstation?, error ->
 					if(error == null) {
-						(application as App).wsOwn = ws
+						(application as App).wsOwn.value = ws
 						onWorkstationOwn(ws)
-						Log.e(TAG, "iniUserData:getByOwner:-------------------"+ws)
 					}
 					else {
 						Log.e(TAG, "iniUserData:getByOwner:e:-------------------", error)
@@ -94,9 +90,8 @@ abstract class BaseActivity: AppCompatActivity() {
 				})
 				WorkstationFire.getByUserRT((application as App).fire, auth.getEmail().toString(), { ws: Workstation?, error ->
 					if(error == null) {
-						(application as App).wsUse = ws
+						(application as App).wsUse.value = ws
 						onWorkstationUse(ws)
-						Log.e(TAG, "iniUserData:getByUser:----------------------------------"+ws)
 					}
 					else {
 						Log.e(TAG, "iniUserData:getByUser:e:---------------------------------", error)

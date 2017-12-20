@@ -16,7 +16,7 @@ object UserFire {
 	private val ROOT_COLLECTION = "users"
 
 	//______________________________________________________________________________________________
-	fun get(fire: Fire, email: String, callback: (User, Throwable?) -> Unit) {
+	/*fun get(fire: Fire, email: String, callback: (User, Throwable?) -> Unit) {
 		fire.getDoc(ROOT_COLLECTION, email)
 			.get().addOnCompleteListener({ task ->
 				if(task.isSuccessful) {
@@ -28,15 +28,14 @@ object UserFire {
 					callback(User(), task.exception)
 				}
 			})
-	}
+	}*/
 	//______________________________________________________________________________________________
 	fun getRT(fire: Fire, email: String, callback: (User, Throwable?) -> Unit) {
 		fire.getDoc(ROOT_COLLECTION, email)
 			.addSnapshotListener({ doc: DocumentSnapshot?, error: FirebaseFirestoreException? ->
 				if(error == null && doc != null) {
-					Log.e(TAG, "getRT:---------------------A--------------------------------")
 					val user = fire.translate(doc, User::class.java) as User
-					callback(user, null)
+					callback(user.copy(doc.id), null)
 				}
 				else {
 					Log.e(TAG, "getRT:e:-------------------------------------------------------", error)

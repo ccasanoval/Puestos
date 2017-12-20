@@ -63,8 +63,8 @@ class MapaActivity : BaseActivity() {
 			Log.e(TAG, "iniViewModel:---------------------------A---------------------------------"+usuario)
 			setTitulo(usuario)
 		})*/
-		viewModel.user.observe(this, Observer { usr ->
-			Log.e(TAG, "iniViewModel:---------------------------A---------------------------------"+usr)
+		viewModel.user.observe(this, Observer { usr: User? ->
+			Log.e(TAG, "iniViewModel:-----------------------USER-----------------------"+usr)
 		})
 		viewModel.camino.observe(this, Observer<Array<PointF>> { camino ->
 			if(camino == null)	delCamino()
