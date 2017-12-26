@@ -44,6 +44,10 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var wsUse: Workstation? = null
 	private var wsUse100: Workstation? = null
 
+	private var wifi: List<PointF>? = null
+	private var wifi100: List<PointF>? = null
+	private var imgWifi: Bitmap? = null
+
 
 	//______________________________________________________________________________________________
 	init {
@@ -80,6 +84,12 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		h = density / 720f * imgWSOwn!!.height
 		imgWSOwn = Bitmap.createScaledBitmap(imgWSOwn!!, w.toInt(), h.toInt(), true)
 		imgWSUse = Bitmap.createScaledBitmap(imgWSUse!!, w.toInt(), h.toInt(), true)
+
+		/// WiFi
+		imgWifi = BitmapFactory.decodeResource(resources, drawable.pto_home)
+		w = density / 720f * imgWifi!!.width
+		h = density / 720f * imgWifi!!.height
+		imgWifi = Bitmap.createScaledBitmap(imgWifi!!, w.toInt(), h.toInt(), true)
 
 		/// Camino
 		strokeWidth = (density / 60f).toInt()
@@ -125,6 +135,19 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 				lospuestos[it].createNewWithPosition(coord.x, coord.y)
 			})
 			puestos100 = null
+			invalidate()
+		}
+	}
+	//______________________________________________________________________________________________
+	fun setWifi(data: List<PointF>) {
+		if( ! isReady) {
+			wifi100 = data
+		}
+		else {
+			wifi = List(data.size, { it ->
+				coord100ToImg(data[it])
+			})
+			wifi100 = null
 			invalidate()
 		}
 	}
@@ -191,6 +214,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		drawCamino(canvas)
 		/// PUESTOS
 		drawPuestos(canvas)
+		/// WIFI AP
+		drawWifi(canvas)
 		/// SELECCIONADO
 		drawSeleccionado(canvas)
 		/// USING & OWNNING
@@ -250,6 +275,17 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 				val x = ptoView.x - img.width /2
 				val y = ptoView.y - img.height /2
 				canvas.drawBitmap(img, x, y, paint)
+			}
+		}
+	}
+	//______________________________________________________________________________________________
+	private fun drawWifi(canvas: Canvas) {
+		if(wifi != null) {
+			for(pto in wifi!!) {
+				sourceToViewCoord(pto, ptoView)
+				val x = ptoView.x - imgWifi!!.width /2
+				val y = ptoView.y - imgWifi!!.height /2
+				canvas.drawBitmap(imgWifi, x, y, paint)
 			}
 		}
 	}

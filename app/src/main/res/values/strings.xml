@@ -21,11 +21,13 @@
     <string name="ruta">Calcular ruta</string>
     <string name="info">Info de puestos</string>
     <string name="puestos">Lista de puestos</string>
+    <string name="add_wifi">Datos wifi</string>
     <string name="puesto_new">Nuevo puesto</string>
     <string name="puesto_del">Borrar puesto</string>
     <string name="ruta_msg">Seleccione comienzo y fin de ruta</string>
     <string name="info_msg">Seleccione el puesto</string>
     <string name="puestos_msg">Lista de puestos</string>
+    <string name="wifi_msg">Adquisicion Wifi</string>
     <string name="puestos_get_error">Error al obtener los puestos</string>
     <string name="puestos_get_none">No se encontraron puestos</string>
 
@@ -57,5 +59,6 @@
     <string name="puesto_vacant_error">No pudo liberarse el puesto</string>
     <string name="save_data_ok">Se guardaron los datos</string>
     <string name="save_data_error">Se produjo un error al guardar los datos</string>
+    <string name="wifi_permiso_error">Sin permisos no podran obtenerse datos de Wifi</string>
 
 </resources>

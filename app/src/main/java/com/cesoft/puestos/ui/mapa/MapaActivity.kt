@@ -3,6 +3,7 @@ package com.cesoft.puestos.ui.mapa
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PointF
 import android.support.v7.widget.Toolbar
 import android.os.Bundle
@@ -19,6 +20,8 @@ import com.cesoft.puestos.ui.puesto.PuestoDialog
 import com.davemorrissey.labs.subscaleview.ImageSource
 import kotlinx.android.synthetic.main.act_main.*
 
+import android.net.wifi.WifiManager
+
 
 /**
  * Created by ccasanova on 29/11/2017
@@ -28,6 +31,7 @@ class MapaActivity : BaseActivity() {
 
 	private lateinit var viewModel : MapaViewModel
 	private var imgListener: View.OnTouchListener ?=null
+
 
 	//______________________________________________________________________________________________
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +49,27 @@ class MapaActivity : BaseActivity() {
 
 		iniViewModel()
 	}
-
 	//______________________________________________________________________________________________
 	override fun onDestroy() {
 		super.onDestroy()
 		imgPlano.destroyDrawingCache()
 		imgPlano.recycle()
+		viewModel.endWifi()
+	}
+
+	//______________________________________________________________________________________________
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+		viewModel.onRequestPermissionsResult(requestCode, permissions, grantResults)
+	}
+	//______________________________________________________________________________________________
+	fun registerWifiReceiver() {
+		registerReceiver(viewModel.wifiStateChangedReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
+		registerReceiver(viewModel.wifiScanAvailableReceiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+	}
+	//______________________________________________________________________________________________
+	fun unregisterWifiReceiver() {
+		unregisterReceiver(viewModel.wifiStateChangedReceiver)
+		unregisterReceiver(viewModel.wifiScanAvailableReceiver)
 	}
 
 	//______________________________________________________________________________________________
@@ -96,8 +115,13 @@ class MapaActivity : BaseActivity() {
 		viewModel.ini.observe(this, Observer<PointF>{ pto -> showPointF(true,pto) })
 		viewModel.end.observe(this, Observer<PointF>{ pto -> showPointF(false,pto) })
 
-		Log.e(TAG, "iniViewModel:-----------------------fin-----------------------")
+		viewModel.wifiState.observe(this, Observer<Boolean> { wifiActivo ->
+			if(wifiActivo!!) registerWifiReceiver()
+			else unregisterWifiReceiver()
+		})
+		viewModel.iniWifi(this)
 
+		Log.e(TAG, "iniViewModel:-----------------------fin-----------------------")
 	}
 
 	//______________________________________________________________________________________________
@@ -134,6 +158,10 @@ class MapaActivity : BaseActivity() {
 				SiNoDialog.show(this,
 						getString(R.string.seguro_logout),
 						{ si -> if(si) viewModel.logout() })
+			}
+			R.id.act_wifi -> {
+				viewModel.modo = MapaViewModel.Modo.Wifi
+				Toast.makeText(this@MapaActivity, getString(R.string.wifi_msg), Toast.LENGTH_SHORT).show()
 			}
 			else ->
 				return super.onOptionsItemSelected(item)
@@ -207,6 +235,7 @@ class MapaActivity : BaseActivity() {
 				User.Type.Interim -> getString(R.string.interim)
 			})
 	}
+
 
 	//______________________________________________________________________________________________
 	companion object {

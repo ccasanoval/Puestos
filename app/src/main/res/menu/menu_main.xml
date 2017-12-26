@@ -19,6 +19,12 @@
         android:title="@string/puestos"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/act_wifi"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="@string/add_wifi"
+        app:showAsAction="ifRoom"/>
+
     <!-- ADMIN -->
     <!-- item
         android:id="@+id/act_puesto_new"

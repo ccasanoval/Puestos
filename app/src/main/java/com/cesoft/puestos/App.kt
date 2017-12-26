@@ -2,6 +2,8 @@ package com.cesoft.puestos
 
 import android.app.Application
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
+import android.net.wifi.WifiManager
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.models.User
@@ -42,6 +44,7 @@ import com.squareup.leakcanary.LeakCanary
 class App : Application() {
 	lateinit var auth: Auth
 	lateinit var fire: Fire
+	lateinit var wifi: WifiManager
 	//var user: User? = null
 	//var wsOwn: Workstation? = null
 	//var wsUse: Workstation? = null
@@ -65,8 +68,10 @@ class App : Application() {
 		//BigImageViewer.initialize(FrescoImageLoader.with(appContext));
 		//BigImageViewer.initialize(GlideImageLoader.with(this))
 
-		/// FIRE AUTH
+		/// FIRE
 		auth = Auth.getInstance(this)
 		fire = Fire()
+		/// WIFI
+		wifi = getSystemService(Context.WIFI_SERVICE) as WifiManager
 	}
 }
