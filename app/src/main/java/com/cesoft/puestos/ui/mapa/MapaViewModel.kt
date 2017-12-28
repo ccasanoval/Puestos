@@ -5,12 +5,8 @@ import android.app.Activity
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PointF
-import android.net.wifi.WifiManager
 import android.os.Build
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,6 +23,9 @@ import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Wifi
 import com.cesoft.puestos.util.Plane
 import com.cesoft.puestos.models.Workstation
+import com.cesoft.puestos.util.Locator
+import com.cesoft.puestos.util.WifiTool
+import java.util.*
 
 
 /**
@@ -40,7 +39,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	val wsOwn: MutableLiveData<Workstation> = getApplication<App>().wsOwn
 	val wsUse: MutableLiveData<Workstation> = getApplication<App>().wsUse
 
-	val mensaje = MutableLiveData<String>()
+	val mensaje = MutableLiveData<String>()	//TODO: String to int:IdString
 	val puestos = MutableLiveData<List<Workstation>>()
 	val selected = MutableLiveData<Workstation>()
 	val camino = MutableLiveData<Array<PointF>>()
@@ -50,8 +49,17 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	val end100 = PointF()
 	val plane = Plane(getApplication())
 
-	val wifiState = MutableLiveData<Boolean>()
+	//val wifiState = MutableLiveData<Boolean>()
+	val wifiPtos = MutableLiveData<List<PointF>>()
 
+	val posicion = MutableLiveData<PointF>()
+
+	//______________________________________________________________________________________________
+	private fun getString(id: Int) = getApplication<App>().getString(id)
+	private val wifi: WifiTool
+		get() = getApplication<App>().wifi
+
+	//______________________________________________________________________________________________
 	enum class Modo { Ruta, Info, Puestos, Wifi }
 	var modo = Modo.Ruta
 		set(value) {
@@ -59,10 +67,14 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			if(modo == Modo.Puestos) {
 				getPuestosRT()
 			}
-			else if(modo == Modo.Wifi) {
-				//iniWifi(activity)
-				getApplication<App>().wifi.startScan()
+			if(modo == Modo.Wifi) {
+				getWifiRT()
+				wifi.addListener(saveWifis)
 			}
+			else {
+				wifi.delListener(saveWifis)
+			}
+
 		}
 
 	//______________________________________________________________________________________________
@@ -71,7 +83,17 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	}
 
 	//______________________________________________________________________________________________
-	fun logout() { auth.logout() }
+	fun onCreate(act: Activity) {
+		iniWifi(act)
+	}
+	//______________________________________________________________________________________________
+	fun onDestroy() {
+		wifi.unregisterWifiReceiver(getApplication())
+	}
+	//______________________________________________________________________________________________
+	fun logout() {
+		auth.logout()
+	}
 
 	//______________________________________________________________________________________________
 	fun punto(pto: PointF, pto100: PointF) {
@@ -109,17 +131,18 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		})
 	}
 	//______________________________________________________________________________________________
-	private fun getWifiRT(callback: (List<PointF>) -> Unit = {}) {
-		/*WifiFire.getAllRT(fire, { lista, error ->
+	private fun getWifiRT() {//callback: (List<PointF>) -> Unit = {}) {
+		WifiFire.getAllPosicionRT(fire, { lista, error ->
 			if(error == null) {
-				puestos.value = lista.toList()
-				callback(lista.toList())
+				wifiPtos.value = lista.toList()
+				Log.e(TAG, "getWifiRT:------------------------------------------------------"+lista.size)
+				//callback(lista.toList())
 			}
 			else {
-				Log.e(TAG, "getPuestos:e:------------------------------------------------------",error)
-				mensaje.value = getApplication<App>().getString(R.string.puestos_get_error)
+				Log.e(TAG, "getWifiRT:e:------------------------------------------------------",error)
+				mensaje.value = getString(R.string.puestos_get_error)
 			}
-		})*/
+		})
 	}
 
 	//______________________________________________________________________________________________
@@ -158,14 +181,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	private fun wifi(pto: PointF, pto100: PointF) {
 		posWifi.set(pto100)
 		isPosWifi = true
-		getApplication<App>().wifi.startScan()
-		/*if(puestos.value != null && puestos.value!!.isNotEmpty()) {
-			infoWifiHelper(puestos.value!!, pto, pto100)
-		}
-		else {
-			getPuestosRT({ lospuestos -> infoHelper(lospuestos, pto, pto100) })
-		}*/
-
+		wifi.scan()
 	}
 
 	//______________________________________________________________________________________________
@@ -202,41 +218,38 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	}
 
 
-
+	////////////////////////////////////////////////////////////////////////////////
+	//TODO: a clase aparte
 	///// WIFI
 	//______________________________________________________________________________________________
 	fun iniWifi(act: Activity) {
 		val app = getApplication<App>()
-
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 				&& app.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 			act.requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), WIFI_RES)
 			//After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
 			Log.e(TAG, "iniWifi:-------------SIN PERMISO------------------------------")
 		}
-		else
-			wifiState.value = true
+		else {
+			wifi.registerWifiReceiver(app)
+		}
 	}
 	//______________________________________________________________________________________________
 	fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
 		if(requestCode == WIFI_RES && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-			wifiState.value = true
-			getApplication<App>().wifi.startScan()
+			wifi.registerWifiReceiver(getApplication())
 		}
 		else {
 			//Toast.makeText(applicationContext, getString(R.string.wifi_permiso_error), Toast.LENGTH_LONG).show()
-			mensaje.value = getApplication<App>().getString(R.string.wifi_permiso_error)
+			mensaje.value = getString(R.string.wifi_permiso_error)
 			Log.e(TAG, "onRequestPermissionsResult:-----------------NO SE CONCEDIO PERMISO--------------------------")
 		}
 	}
 
-	//______________________________________________________________________________________________
-	fun endWifi() {
-		wifiState.value = false
-	}
+
 
 	//______________________________________________________________________________________________
-	@Transient val wifiStateChangedReceiver = object : BroadcastReceiver() {
+	/*@Transient val wifiStateChangedReceiver = object : BroadcastReceiver() {
 		override fun onReceive(context: Context, intent: Intent) {
 			val extraWifiState = intent.getIntExtra(
 					WifiManager.EXTRA_WIFI_STATE,
@@ -250,15 +263,16 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	//______________________________________________________________________________________________
 	@Transient val wifiScanAvailableReceiver = object : BroadcastReceiver() {
 		override fun onReceive(context: Context, intent: Intent) {
-			Log.e(TAG, "------------------- New scan finished "+getApplication<App>().wifi.scanResults.size)
+			Log.e(TAG, "------------------- New scan finished "+wifi.scanResults.size)
 
 			//creates a list of accesspointinfos from the list of scanresults.
 			val apinfos = ArrayList<Wifi>()
-			for(s in getApplication<App>().wifi.scanResults) {
+			for(s in wifi.scanResults) {
 				apinfos.add(Wifi(s.BSSID,
 						s.level,
 						s.BSSID,
 						s.SSID,
+						Date().toString(),
 						posWifi.x,
 						posWifi.y
 				))
@@ -280,7 +294,59 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 			isPosWifi = false
 		}
+	}*/
+
+	///////////////////////////////////////////////////////////////////////////
+	///// INI: LOCATION ----------------------------------------------------------------------------
+	var timer = Timer()
+	val localizador = fun(wifis: ArrayList<Wifi>){ Locator.locate(wifis)}
+
+	val saveWifis = fun(wifis: ArrayList<Wifi>){
+		// Save to Fire
+		if(isPosWifi) {
+			WifiFire.save(fire, wifis, { error ->
+				if(error == null) {
+					Log.e(TAG, "WIFI: FIRE: onReceive: OK--------------------------------------")
+					//TODO: Avisar user mostrando punto: o se carga por RT...
+				}
+				else {
+					Log.e(TAG, "WIFI: FIRE: onReceive:e:--------------------------------------",error)
+					//TODO: Avisar user mostrando error
+				}
+			})
+		}
+		isPosWifi = false
 	}
+
+
+	//______________________________________________________________________________________________
+	fun onResume() {
+		Locator.init(getApplication())
+		//wifi.registerWifiReceiver(getApplication())
+		wifi.addListener(localizador)
+		timer = Timer()
+		timer.schedule(Task(), 0, 5000)
+	}
+	//______________________________________________________________________________________________
+	fun onPause() {
+		//wifi.unregisterWifiReceiver(getApplication())
+		wifi.delListener(localizador)
+		timer.cancel()
+		timer.purge()
+	}
+
+	//______________________________________________________________________________________________
+	internal inner class Task : TimerTask() {
+		override fun run() {
+			Log.e(TAG, "Task:run:------------------------------------"+Date())
+			wifi.scan()
+		}
+	}
+
+
+	///// END: LOCATION ----------------------------------------------------------------------------
+
+
 
 	//______________________________________________________________________________________________
 	companion object {

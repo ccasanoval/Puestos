@@ -3,10 +3,34 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 def sdk = "26.1.0"
-def fire = "11.6.2"
+def fire = "11.8.0"
+def dl4j = "0.9.1"
+def blas = "0.2.20-1.3"
+def lombok = "1.16.16"
 android {
     compileSdkVersion 26
+
+    //Deeplearning4j
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'org/bytedeco/javacpp/windows-x86/msvcp120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86_64/msvcp120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86/msvcr120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86_64/msvcr120.dll'
+        //exclude 'lib/armeabi-v7a/libnative-lib.so'
+        //exclude 'lib/armeabi-v7a' //Si tiene areabi-v7a, no cogera armeabi, que es donde estan las libs de blas...
+    }
+
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.cesoft.puestos"
         minSdkVersion 19
         targetSdkVersion 26 //26 por SubsamplingScaleImageView
@@ -18,11 +42,14 @@ android {
                 cppFlags ""
             }
         }
+        ndk {
+            abiFilters "armeabi", "x86", "mips" //, "armeabi-v7a"
+        }
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //minifyEnabled false
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     externalNativeBuild {
@@ -37,9 +64,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$sdk"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    //testImplementation 'junit:junit:4.8.2'
+    //androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
     // 4 android:layout_height="?attr/actionBarSize"
     implementation 'com.android.support:support-compat:26.1.0'
     implementation "com.android.support:design:$sdk"
@@ -68,6 +96,23 @@ dependencies {
     /// Leak Canary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+
+    /// Deeplearning4j
+    implementation "org.deeplearning4j:deeplearning4j-core:$dl4j"
+    implementation "org.nd4j:nd4j-native:$dl4j"
+    implementation "org.nd4j:nd4j-native:$dl4j:android-x86"
+    implementation "org.nd4j:nd4j-native:$dl4j:android-arm"
+    implementation "org.bytedeco.javacpp-presets:openblas:$blas:android-x86"
+    implementation "org.bytedeco.javacpp-presets:openblas:$blas:android-arm"
+    provided "org.projectlombok:lombok:$lombok"
+    annotationProcessor "org.projectlombok:lombok:$lombok"
+    implementation 'com.google.code.findbugs:annotations:3.0.1', {
+        exclude module: 'jsr305'
+        exclude module: 'jcip-annotations'
+    }
+
+    /// Multidex
+    compile 'com.android.support:multidex:1.0.2'
 }
 
 // Firebase

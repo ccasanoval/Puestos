@@ -52,9 +52,8 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	override fun onDestroy() {
 		super.onDestroy()
-		imgPlano.destroyDrawingCache()
-		imgPlano.recycle()
-		viewModel.endWifi()
+		imgPlano.onDestroy()
+		viewModel.onDestroy()
 	}
 
 	//______________________________________________________________________________________________
@@ -62,7 +61,7 @@ class MapaActivity : BaseActivity() {
 		viewModel.onRequestPermissionsResult(requestCode, permissions, grantResults)
 	}
 	//______________________________________________________________________________________________
-	fun registerWifiReceiver() {
+	/*fun registerWifiReceiver() {
 		registerReceiver(viewModel.wifiStateChangedReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
 		registerReceiver(viewModel.wifiScanAvailableReceiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
 	}
@@ -70,7 +69,7 @@ class MapaActivity : BaseActivity() {
 	fun unregisterWifiReceiver() {
 		unregisterReceiver(viewModel.wifiStateChangedReceiver)
 		unregisterReceiver(viewModel.wifiScanAvailableReceiver)
-	}
+	}*/
 
 	//______________________________________________________________________________________________
 	private fun iniViewModel() {
@@ -115,11 +114,16 @@ class MapaActivity : BaseActivity() {
 		viewModel.ini.observe(this, Observer<PointF>{ pto -> showPointF(true,pto) })
 		viewModel.end.observe(this, Observer<PointF>{ pto -> showPointF(false,pto) })
 
-		viewModel.wifiState.observe(this, Observer<Boolean> { wifiActivo ->
+		viewModel.wifiPtos.observe(this, Observer<List<PointF>> { lista ->
+			if(lista != null)
+			showWifi(lista)
+		})
+		/*viewModel.wifiState.observe(this, Observer<Boolean> { wifiActivo ->
 			if(wifiActivo!!) registerWifiReceiver()
 			else unregisterWifiReceiver()
-		})
-		viewModel.iniWifi(this)
+		})*/
+		viewModel.posicion.observe(this, Observer<PointF>{ pto -> if(pto!=null) imgPlano.setPosicion(pto) })
+		viewModel.onCreate(this)
 
 		Log.e(TAG, "iniViewModel:-----------------------fin-----------------------")
 	}
@@ -203,7 +207,12 @@ class MapaActivity : BaseActivity() {
 	//______________________________________________________________________________________________
 	private fun showPuestos(puestos: List<Workstation>) {
 		if(puestos.isNotEmpty())
-		imgPlano.setPuestos(puestos)
+			imgPlano.setPuestos(puestos)
+	}
+	//______________________________________________________________________________________________
+	private fun showWifi(lista: List<PointF>) {
+		if(lista.isNotEmpty())
+			imgPlano.setWifi(lista)
 	}
 
 	//______________________________________________________________________________________________
@@ -234,6 +243,52 @@ class MapaActivity : BaseActivity() {
 				User.Type.Fixed -> getString(R.string.fixed)
 				User.Type.Interim -> getString(R.string.interim)
 			})
+	}
+
+
+
+	/*///// INI: LOCATION ----------------------------------------------------------------------------
+	var timer = Timer()
+	//______________________________________________________________________________________________
+	override fun onPause() {
+		super.onPause()
+		timer.cancel()
+		timer.purge()
+	}
+	//______________________________________________________________________________________________
+	override fun onResume() {
+		super.onResume()
+		Locator.init(application)
+		timer = Timer()
+		timer.schedule(Task(), 0, 2500)
+	}
+	//______________________________________________________________________________________________
+	internal inner class Task : TimerTask() {
+		override fun run() {
+			Log.e(TAG, "Task:run:------------------------------------"+Date())
+			val pos = Locator.locate(getWifiFeatures())
+			if(pos != null)
+				runOnUiThread({imgPlano.setPosicion(pos)})
+			//h.sendEmptyMessage(0)
+		}
+	}
+	//______________________________________________________________________________________________
+	fun getWifiFeatures(): DoubleArray {
+		//TODO: get wifi data...
+		return DoubleArray(10, { index -> -60.0 })
+	}*/
+
+	///// END: LOCATION ----------------------------------------------------------------------------
+
+	//______________________________________________________________________________________________
+	override fun onPause() {
+		super.onPause()
+		viewModel.onPause()
+	}
+	//______________________________________________________________________________________________
+	override fun onResume() {
+		super.onResume()
+		viewModel.onResume()
 	}
 
 

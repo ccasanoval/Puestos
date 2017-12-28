@@ -48,6 +48,10 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	private var wifi100: List<PointF>? = null
 	private var imgWifi: Bitmap? = null
 
+	private val posicion = PointF(0f,0f)
+	private var imgPos: Bitmap? = null
+
+
 
 	//______________________________________________________________________________________________
 	init {
@@ -86,13 +90,25 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		imgWSUse = Bitmap.createScaledBitmap(imgWSUse!!, w.toInt(), h.toInt(), true)
 
 		/// WiFi
-		imgWifi = BitmapFactory.decodeResource(resources, drawable.pto_home)
+		imgWifi = BitmapFactory.decodeResource(resources, drawable.wifi)
 		w = density / 720f * imgWifi!!.width
 		h = density / 720f * imgWifi!!.height
 		imgWifi = Bitmap.createScaledBitmap(imgWifi!!, w.toInt(), h.toInt(), true)
 
+		/// Posicion
+		imgPos = BitmapFactory.decodeResource(resources, drawable.posicion)
+		w = density / 420f * imgPos!!.width
+		h = density / 420f * imgPos!!.height
+		imgPos = Bitmap.createScaledBitmap(imgPos!!, w.toInt(), h.toInt(), true)
+
 		/// Camino
 		strokeWidth = (density / 60f).toInt()
+	}
+
+	//______________________________________________________________________________________________
+	fun onDestroy() {
+		destroyDrawingCache()
+		recycle()
 	}
 
 	//______________________________________________________________________________________________
@@ -150,6 +166,11 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			wifi100 = null
 			invalidate()
 		}
+	}
+	//______________________________________________________________________________________________
+	fun setPosicion(pto: PointF) {
+		posicion.set(coord100ToImg(pto))
+		invalidate()
 	}
 	//______________________________________________________________________________________________
 	fun setSeleccionado(puesto: Workstation?) {
@@ -221,6 +242,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		/// USING & OWNNING
 		drawWSOwn(canvas)
 		drawWSUse(canvas)
+		/// POSICION
+		drawPosicion(canvas)
 	}
 	//______________________________________________________________________________________________
 	private fun drawIni(canvas: Canvas){
@@ -316,6 +339,16 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 			val img = imgWSUse!!
 			val x = ptoView.x - img.width /2
 			val y = ptoView.y - img.height
+			canvas.drawBitmap(img, x, y, paint)
+		}
+	}
+	//______________________________________________________________________________________________
+	fun drawPosicion(canvas: Canvas) {
+		if(posicion.x > 0 && posicion.y > 0) {
+			sourceToViewCoord(PointF(posicion.x, posicion.y), ptoView)
+			val img = imgPos!!
+			val x = posicion.x - img.width /2
+			val y = posicion.y - img.height
 			canvas.drawBitmap(img, x, y, paint)
 		}
 	}

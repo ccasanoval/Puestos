@@ -1,13 +1,12 @@
 package com.cesoft.puestos
 
-import android.app.Application
 import android.arch.lifecycle.MutableLiveData
-import android.content.Context
-import android.net.wifi.WifiManager
+import android.support.multidex.MultiDexApplication
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
 import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Workstation
+import com.cesoft.puestos.util.WifiTool
 import com.squareup.leakcanary.LeakCanary
 
 
@@ -28,23 +27,22 @@ import com.squareup.leakcanary.LeakCanary
 //INDOOR LOCATION
 //https://play.google.com/store/apps/details?id=com.microsoft.msra.followus.app
 //https://arxiv.org/ftp/arxiv/papers/1405/1405.5669.pdf & what u did
+//https://deeplearning4j.org/overview
 
-//TODO: Login: Admin: Permite añadir puestos de trabajo, modificarlos, borrarlos...
-//						Permite añadir y editar y borrar usuarios
-//						Permite asignar puestos de trabajo
-//				User: Permite bucar y ver puestos de trabajo...
-//						Permite reservar puestos de trabajo
-//TODO: showWorkstations, showFreeWorkstations(day), ...
+// ANN
+//https://github.com/mccorby/FederatedAndroidTrainer
+//http://progur.com/2017/01/how-to-use-deeplearning4j-on-android.html
 
 
 /**
  * Created by ccasanova on 30/11/2017
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-class App : Application() {
+class App : MultiDexApplication() {
 	lateinit var auth: Auth
 	lateinit var fire: Fire
-	lateinit var wifi: WifiManager
+	lateinit var wifi: WifiTool
+	//lateinit var wifi: WifiManager
 	//var user: User? = null
 	//var wsOwn: Workstation? = null
 	//var wsUse: Workstation? = null
@@ -72,6 +70,7 @@ class App : Application() {
 		auth = Auth.getInstance(this)
 		fire = Fire()
 		/// WIFI
-		wifi = getSystemService(Context.WIFI_SERVICE) as WifiManager
+		wifi = WifiTool(this)
 	}
+
 }

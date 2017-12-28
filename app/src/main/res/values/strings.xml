@@ -30,6 +30,7 @@
     <string name="wifi_msg">Adquisicion Wifi</string>
     <string name="puestos_get_error">Error al obtener los puestos</string>
     <string name="puestos_get_none">No se encontraron puestos</string>
+    <string name="wifis_error">Error al recuperar los datos de Wifi</string>
 
     <!-- DLG PUESTO -->
     <string name="ocupar">Ocupar</string>
