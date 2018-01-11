@@ -73,6 +73,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 			else {
 				wifi.delListener(saveWifis)
+				wifiPtos.value = null
 			}
 
 		}
@@ -140,6 +141,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 			}
 			else {
 				Log.e(TAG, "getWifiRT:e:------------------------------------------------------",error)
+				wifiPtos.value = null
 				mensaje.value = getString(R.string.puestos_get_error)
 			}
 		})
@@ -248,63 +250,18 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 
 
 
-	//______________________________________________________________________________________________
-	/*@Transient val wifiStateChangedReceiver = object : BroadcastReceiver() {
-		override fun onReceive(context: Context, intent: Intent) {
-			val extraWifiState = intent.getIntExtra(
-					WifiManager.EXTRA_WIFI_STATE,
-					WifiManager.WIFI_STATE_UNKNOWN)
-			when(extraWifiState) {
-				WifiManager.WIFI_STATE_DISABLED -> Log.e(TAG, "wifiStateChangedReceiver: WIFI_STATE_DISABLED")
-				WifiManager.WIFI_STATE_ENABLED -> Log.e(TAG, "wifiStateChangedReceiver: WIFI_STATE_ENABLED")
-			}
-		}
-	}
-	//______________________________________________________________________________________________
-	@Transient val wifiScanAvailableReceiver = object : BroadcastReceiver() {
-		override fun onReceive(context: Context, intent: Intent) {
-			Log.e(TAG, "------------------- New scan finished "+wifi.scanResults.size)
-
-			//creates a list of accesspointinfos from the list of scanresults.
-			val apinfos = ArrayList<Wifi>()
-			for(s in wifi.scanResults) {
-				apinfos.add(Wifi(s.BSSID,
-						s.level,
-						s.BSSID,
-						s.SSID,
-						Date().toString(),
-						posWifi.x,
-						posWifi.y
-				))
-				Log.e(TAG, "wifiScanAvailableReceiver:------------"+s.BSSID+" : "+s.SSID+" : "+s.level+" : ")
-			}
-
-			// Save to Fire
-			if(isPosWifi) {
-				WifiFire.save(fire, apinfos, { error ->
-					if(error == null) {
-						Log.e(TAG, "WIFI: FIRE: onReceive: OK--------------------------------------")
-						//TODO: Avisar user mostrando punto: o se carga por RT...
-					}
-					else {
-						Log.e(TAG, "WIFI: FIRE: onReceive:e:--------------------------------------",error)
-						//TODO: Avisar user mostrando error
-					}
-				})
-			}
-			isPosWifi = false
-		}
-	}*/
-
 	///////////////////////////////////////////////////////////////////////////
 	///// INI: LOCATION ----------------------------------------------------------------------------
 	var timer = Timer()
-	val localizador = fun(wifis: ArrayList<Wifi>){ Locator.locate(wifis)}
+	val localizador = fun(wifis: ArrayList<Wifi>) {
+		//Log.e(TAG, "localizador:---------------------------------------------------------------")
+		posicion.value = Locator.locate(wifis)
+	}
 
 	val saveWifis = fun(wifis: ArrayList<Wifi>){
 		// Save to Fire
 		if(isPosWifi) {
-			WifiFire.save(fire, wifis, { error ->
+			WifiFire.save(fire, posWifi, wifis, { error ->
 				if(error == null) {
 					Log.e(TAG, "WIFI: FIRE: onReceive: OK--------------------------------------")
 					//TODO: Avisar user mostrando punto: o se carga por RT...
@@ -325,7 +282,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 		//wifi.registerWifiReceiver(getApplication())
 		wifi.addListener(localizador)
 		timer = Timer()
-		timer.schedule(Task(), 0, 5000)
+		timer.schedule(Task(), 0, 2500)
 	}
 	//______________________________________________________________________________________________
 	fun onPause() {
@@ -338,14 +295,12 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	//______________________________________________________________________________________________
 	internal inner class Task : TimerTask() {
 		override fun run() {
-			Log.e(TAG, "Task:run:------------------------------------"+Date())
+			//Log.e(TAG, "Task:run:------------------------------------"+Date())
 			wifi.scan()
 		}
 	}
 
-
 	///// END: LOCATION ----------------------------------------------------------------------------
-
 
 
 	//______________________________________________________________________________________________

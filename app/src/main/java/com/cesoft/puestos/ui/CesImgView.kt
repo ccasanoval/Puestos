@@ -196,10 +196,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 	fun setWSUse(puesto: Workstation?) {
 		if( ! isReady) {
 			wsUse100 = puesto
-			Log.e(TAG, "setWSUse:------0-------------------------------------------"+puesto)
 		}
 		else if(puesto != null) {
-			Log.e(TAG, "setWSUse:-------1------------------------------------------"+puesto)
 			val coord: PointF = coord100ToImg(PointF(puesto.x, puesto.y))
 			wsUse = puesto.createNewWithPosition(coord.x, coord.y)
 			wsUse100 = null
@@ -347,8 +345,8 @@ class CesImgView @JvmOverloads constructor(context: Context, attr: AttributeSet?
 		if(posicion.x > 0 && posicion.y > 0) {
 			sourceToViewCoord(PointF(posicion.x, posicion.y), ptoView)
 			val img = imgPos!!
-			val x = posicion.x - img.width /2
-			val y = posicion.y - img.height
+			val x = ptoView.x - img.width /2
+			val y = ptoView.y - img.height
 			canvas.drawBitmap(img, x, y, paint)
 		}
 	}

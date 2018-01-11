@@ -14,7 +14,8 @@ import org.nd4j.linalg.factory.Nd4j
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 object Locator {
-	var net: MultiLayerNetwork ? = null
+	private val TAG: String = Locator::class.java.simpleName
+	private var net: MultiLayerNetwork ? = null
 
 	val MACS = arrayOf(
 			"24:1f:a0:dc:7f:ff",
@@ -38,9 +39,6 @@ object Locator {
 		return DoubleArray(MACS.size, { i ->
 			wifis.firstOrNull { it.bssid == MACS[i] }?.level?.toDouble() ?: -99.0
 		})
-		/*for(mac in MACS) {
-			val level = wifis.firstOrNull { it.bssid == mac }?.level ?: -99L
-		}*/
 	}
 
 	//______________________________________________________________________________________________
@@ -51,7 +49,7 @@ object Locator {
 			net = ModelSerializer.restoreMultiLayerNetwork(netRaw)
 		}
 		catch(e: Exception) {
-			Log.e("Locator", "init: Error cargando la ANN ",e)
+			Log.e("Locator", "init: Error cargando la ANN ---------------------------------",e)
 		}
 	}
 
@@ -62,8 +60,38 @@ object Locator {
 	//______________________________________________________________________________________________
 	fun locate(features: DoubleArray): PointF? {
 		if(net == null) return null
-		val input: INDArray = Nd4j.create(features)//floatArrayOf(1f, 2f, 3f, 4f), intArrayOf(2, 2));
+		//Log.e("Locator", "LOCATE INI ---------------------------------"+java.util.Date().time)
+
+		//Normalizar Entrada
+		val maxIn = -25
+		val minIn = -99
+		val features2 = DoubleArray(features.size, { index ->
+			(features[index] - minIn) / (maxIn - minIn)
+		})
+		val input: INDArray = Nd4j.create(features2)
+
+		//Predecir
 		val output: INDArray = net!!.output(input)
-		return PointF(output.getFloat(0), output.getFloat(1))
+		var x = output.getFloat(0)
+		var y = output.getFloat(1)
+
+		//Denormalizar Salida
+		/*val minOut = 0
+		val maxOut = 100
+		x *= (maxOut - minOut) + minOut
+		y *= (maxOut - minOut) + minOut*/
+
+
+		//Salida
+		//Log.e(TAG, "-----------------output1: "+x+", "+y)
+		if(x > 100)x=100f
+		if(x < 0)x=0f
+		if(y > 100)y=100f
+		if(y < 0)y=0f
+		//Log.e(TAG, "-----------------output2: "+x+", "+y)
+		//Log.e("Locator", "LOCATE END ---------------------------------"+java.util.Date().time)
+
+		return PointF(x,y)
 	}
+
 }
