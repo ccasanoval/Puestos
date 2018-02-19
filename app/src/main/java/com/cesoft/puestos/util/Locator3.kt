@@ -10,10 +10,10 @@ import org.nd4j.linalg.factory.Nd4j
 
 
 /**
- * Created by ccasanova on 28/12/2017
+ * Created by ccasanova on 16/01/2018
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-object Locator {
+object Locator3 {
 	private val TAG: String = Locator::class.java.simpleName
 	private var net: MultiLayerNetwork ? = null
 
@@ -28,12 +28,6 @@ object Locator {
 			"44:e4:d9:00:76:40",
 			"64:d9:89:c4:0d:63",
 			"44:e4:d9:00:76:47"
-			//"e2:55:7d:b3:37:90",
-			//"c0:62:6b:8e:96:b0",
-			//"64:d9:89:99:8d:e7",
-			//"58:35:d9:64:5b:10",
-			//"64:d9:89:c4:0d:61",
-			//"00:12:5f:0b:bc:70"
 	)
 	fun getFeatures(wifis: List<Wifi>): DoubleArray {
 		return DoubleArray(MACS.size, { i ->
@@ -45,7 +39,10 @@ object Locator {
 	fun init(app: Application) {
 		if(net != null)return
 		try {
-			val netRaw = app.assets.open("CesNet.zip")//Modelo Deeplearning4J
+			// Tuve que modificar en el modelo (zip->configuration.json) el valor
+			// 'VAR_SCALING_UNIFORM_FAN_AVG' por uno que si tenga DL4J, como:
+			//[DISTRIBUTION, ZERO, SIGMOID_UNIFORM, UNIFORM, XAVIER, XAVIER_UNIFORM, XAVIER_FAN_IN, XAVIER_LEGACY, RELU, RELU_UNIFORM]
+			val netRaw = app.assets.open("CesNetKeras.zip")//Modelo Keras exportado a Deeplearning4J
 			net = ModelSerializer.restoreMultiLayerNetwork(netRaw)
 		}
 		catch(e: Exception) {
@@ -60,13 +57,12 @@ object Locator {
 	//______________________________________________________________________________________________
 	fun locate(features: DoubleArray): PointF? {
 		if(net == null) return null
-		//Log.e("Locator", "LOCATE INI ---------------------------------"+java.util.Date().time)
 
 		//Normalizar Entrada
-		val maxIn = -25
-		val minIn = -99
+		val mean = -65.281481
+		val stdDev = 2.145915
 		val features2 = DoubleArray(features.size, { index ->
-			(features[index] - minIn) / (maxIn - minIn)
+			(features[index] - mean) / stdDev
 		})
 		val input: INDArray = Nd4j.create(features2)
 
@@ -75,15 +71,7 @@ object Locator {
 		var x = output.getFloat(0)
 		var y = output.getFloat(1)
 
-		//Denormalizar Salida
-		/*val minOut = 0
-		val maxOut = 100
-		x *= (maxOut - minOut) + minOut
-		y *= (maxOut - minOut) + minOut*/
-
-
 		//Salida
-		//Log.e(TAG, "-----------------output1: "+x+", "+y)
 		if(x > 100)x=100f
 		if(x < 0)x=0f
 		if(y > 100)y=100f

@@ -64,25 +64,19 @@ class WifiTool(app: Application) {
 	//______________________________________________________________________________________________
 	@Transient val wifiScanAvailableReceiver = object : BroadcastReceiver() {
 		override fun onReceive(context: Context, intent: Intent) {
-			//Log.e(TAG, "------------------- Scan finish 0: "+wifi.scanResults.size+"  ::: "+Date().time)
-
 			val apinfos = ArrayList<Wifi>()
 			for(s in wifi.scanResults) {
 				apinfos.add(Wifi(s.BSSID, s.level, s.BSSID, s.SSID, Date().toString(), -1f,-1f))
 				//Log.e(TAG, "wifiScanAvailableReceiver:------------"+s.BSSID+" : "+s.SSID+" : "+s.level+" : ")
 			}
 			for(listener in listeners) {
-				//Log.e(TAG, "------------------- Listener "+listener)
 				listener(apinfos)
 			}
-
-			//Log.e(TAG, "------------------- Scan finish 1: "+wifi.scanResults.size+"  ::: "+Date().time)
 		}
 	}
 
 	//______________________________________________________________________________________________
 	fun scan() {
-		//Log.e(TAG, "------------------- Start scan ::: "+Date().time)
 		wifi.startScan()
 	}
 

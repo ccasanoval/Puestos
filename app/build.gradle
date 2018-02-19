@@ -110,6 +110,7 @@ dependencies {
         exclude module: 'jsr305'
         exclude module: 'jcip-annotations'
     }
+    implementation "org.deeplearning4j:deeplearning4j-modelimport:$dl4j"
 
     /// Multidex
     compile 'com.android.support:multidex:1.0.2'

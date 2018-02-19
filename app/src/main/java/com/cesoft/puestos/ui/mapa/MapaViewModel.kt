@@ -13,7 +13,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 import com.cesoft.puestos.App
-import com.cesoft.puestos.util.Log
 import com.cesoft.puestos.R
 import com.cesoft.puestos.data.auth.Auth
 import com.cesoft.puestos.data.fire.Fire
@@ -21,10 +20,8 @@ import com.cesoft.puestos.data.fire.WifiFire
 import com.cesoft.puestos.data.fire.WorkstationFire
 import com.cesoft.puestos.models.User
 import com.cesoft.puestos.models.Wifi
-import com.cesoft.puestos.util.Plane
 import com.cesoft.puestos.models.Workstation
-import com.cesoft.puestos.util.Locator
-import com.cesoft.puestos.util.WifiTool
+import com.cesoft.puestos.util.*
 import java.util.*
 
 
@@ -254,8 +251,7 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 	///// INI: LOCATION ----------------------------------------------------------------------------
 	var timer = Timer()
 	val localizador = fun(wifis: ArrayList<Wifi>) {
-		//Log.e(TAG, "localizador:---------------------------------------------------------------")
-		posicion.value = Locator.locate(wifis)
+		posicion.value = Locator3.locate(wifis)//TODO:--------------------------------------------------------------
 	}
 
 	val saveWifis = fun(wifis: ArrayList<Wifi>){
@@ -278,7 +274,9 @@ class MapaViewModel(app: Application) : AndroidViewModel(app) {
 
 	//______________________________________________________________________________________________
 	fun onResume() {
-		Locator.init(getApplication())
+		//Locator.init(getApplication())
+		//Locator2.init(getApplication())
+		Locator3.init(getApplication())
 		//wifi.registerWifiReceiver(getApplication())
 		wifi.addListener(localizador)
 		timer = Timer()
